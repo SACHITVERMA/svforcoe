@@ -204,10 +204,10 @@
       const userEmail = sessionStorage.getItem("user_id");
 
       async function initResultPage() {
-        if (!userEmail) {
-          window.location.href = "login.html";
-          return;
-        }
+        // if (!userEmail) {
+        //   window.location.href = "login.html";
+        //   return;
+        // }
 
         try {
           // 1. student profile
@@ -275,3 +275,4 @@
     </script>
   </body>
 </html>
+
