@@ -1,0 +1,220 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Student Verification | Admin</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        :root { --primary: #6a11cb; --success: #2ecc71; --danger: #ff4757; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f4f7f6; margin: 0; padding: 20px; }
+        .container { max-width: 1200px; margin: auto; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .back-btn { text-decoration: none; color: var(--primary); font-weight: bold; }
+        
+        .verify-card { background: white; border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); display: flex; gap: 20px; align-items: center; }
+        .student-img { width: 80px; height: 100px; object-fit: cover; border-radius: 5px; border: 1px solid #ddd; }
+        .student-info { flex: 1; }
+        .student-info h4 { margin: 0 0 5px; color: #333; }
+        .student-info p { margin: 2px 0; font-size: 13px; color: #666; }
+        
+        .action-btns { display: flex; gap: 10px; }
+        .btn { border: none; padding: 10px 18px; border-radius: 6px; cursor: pointer; font-weight: 600; color: white; transition: 0.3s; }
+        .btn-edit { background: #3498db; }
+        .btn-approve { background: var(--success); }
+        .btn-reject { background: var(--danger); }
+        .btn:hover { opacity: 0.8; transform: translateY(-1px); }
+
+        /* Edit Form Grid */
+        .edit-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; text-align: left; }
+        .edit-grid label { font-size: 12px; font-weight: bold; color: #555; margin-top: 5px; display: block;}
+        .edit-grid input, .edit-grid select { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+        .full-row { grid-column: span 2; }
+    
+/* --- MOBILE RESPONSIVE MEDIA QUERY --- */
+@media (max-width: 768px) {
+    .header { 
+        flex-direction: column; 
+        text-align: center; 
+        gap: 15px; 
+    }
+
+    .verify-card { 
+        flex-direction: column; 
+        text-align: center; 
+        padding: 15px;
+    }
+
+    .student-img { 
+        width: 100px; 
+        height: 120px; 
+        margin-bottom: 10px;
+    }
+
+    .action-btns { 
+        flex-direction: column; 
+        width: 100%; 
+        gap: 10px;
+    }
+
+    .btn { 
+        width: 100%; 
+        padding: 12px; 
+        font-size: 14px;
+    }
+
+    .edit-grid { 
+        grid-template-columns: 1fr !important; 
+    }
+    
+    .full-row { 
+        grid-column: span 1 !important; 
+    }
+   }
+
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <div>
+        <a href="admin.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i> Back to Dashboard</a>
+        <h2><i class="fa-solid fa-user-shield"></i> ID Card Verification Portal</h2>
+        
+    </div>
+    <a href="varified_students.html" style="padding: 10px 20px; background: var(--success); color: white; text-decoration: none; border-radius: 8px; font-weight: bold; box-shadow: 0 4px 10px rgba(46, 204, 113, 0.3);">
+        <i class="fa-solid fa-list-check"></i> View Verified Registry
+    </a>
+</div>
+
+    <div id="pendingList"><p>Loading applications...</p></div>
+</div>
+
+<script>
+    const API_BASE = "http://127.0.0.1:5000"; 
+
+    async function loadPendingStudents() {
+        try {
+            const res = await fetch(`${API_BASE}/admin/get_pending_id_apps`);
+            const students = await res.json();
+            const listDiv = document.getElementById('pendingList');
+            
+            if (!students || students.length === 0) {
+                listDiv.innerHTML = '<div class="verify-card">No pending applications found.</div>';
+                return;
+            }
+
+            listDiv.innerHTML = students.map(s => `
+                <div class="verify-card" id="card-${s.id}">
+                    <img src="${API_BASE}/static/uploads/id_docs/${s.photo}" class="student-img" alt="Photo">
+                    <div class="student-info">
+                        <h4>${s.fullName} (${s.rollNo})</h4>
+                        <p><b>Dept:</b> ${s.dept} | <b>Year:</b> ${s.academic_year || 'N/A'}</p>
+                        <p><b>Parents:</b> F: ${s.fatherName}, M: ${s.motherName}</p>
+                        <p><b>Docs:</b> <a href="${API_BASE}/static/uploads/id_docs/${s.marksheet}" target="_blank" style="color:var(--primary); font-weight:bold;">View Marksheet</a></p>
+                    </div>
+                    <div class="action-btns">
+                        <button class="btn btn-edit" onclick="openEditModal(${JSON.stringify(s).replace(/"/g, '&quot;')})">
+                            <i class="fa-solid fa-pen-to-square"></i> Full Edit
+                        </button>
+                        <button class="btn btn-approve" onclick="updateStatus('${s.id}', 'Approved')">
+                            <i class="fa-solid fa-check"></i> Approve
+                        </button>
+                        <button class="btn btn-reject" onclick="updateStatus('${s.id}', 'Rejected')">
+                            <i class="fa-solid fa-xmark"></i> Reject
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        } catch (e) { listDiv.innerHTML = "Error connecting to server."; }
+    }
+
+    async function openEditModal(s) {
+        const { value: formValues } = await Swal.fire({
+            title: `Edit Details: ${s.fullName}`,
+            width: '600px',
+            html: `
+                <div class="edit-grid">
+                    <div><label>Full Name</label><input id="edit-name" value="${s.fullName}"></div>
+                    <div><label>Roll Number</label><input id="edit-roll" value="${s.rollNo}"></div>
+                    <div><label>Father's Name</label><input id="edit-father" value="${s.fatherName}"></div>
+                    <div><label>Mother's Name</label><input id="edit-mother" value="${s.motherName}"></div>
+                    <div><label>Department</label>
+                        <select id="edit-dept">
+                            <option value="BCA" ${s.dept==='BCA'?'selected':''}>BCA</option>
+                            <option value="B.Sc" ${s.dept==='B.Sc'?'selected':''}>B.Sc</option>
+                            <option value="B.A" ${s.dept==='B.A'?'selected':''}>B.A</option>
+                            <option value="B.Com" ${s.dept==='B.Com'?'selected':''}>B.Com</option>
+                        </select>
+                    </div>
+                    <div><label>Academic Year</label><input id="edit-year" value="${s.academic_year || ''}"></div>
+                    <div class="full-row"><label>Phone Number</label><input id="edit-phone" value="${s.phone || ''}"></div>
+                    
+                    <div class="full-row" style="margin-top:15px; border-top:1px solid #eee; padding-top:10px;">
+                        <label style="color:var(--danger)">Update Student Photo (Optional)</label>
+                        <input type="file" id="edit-photo-file" accept="image/*">
+                    </div>
+                    <div class="full-row">
+                        <label style="color:var(--danger)">Update Marksheet (Optional)</label>
+                        <input type="file" id="edit-mark-file" accept=".pdf,image/*">
+                    </div>
+                </div>
+            `,
+            showCancelButton: true,
+            confirmButtonText: 'Save Changes',
+            preConfirm: () => {
+                const formData = new FormData();
+                formData.append('id', s.id);
+                formData.append('fullName', document.getElementById('edit-name').value);
+                formData.append('rollNo', document.getElementById('edit-roll').value);
+                formData.append('fatherName', document.getElementById('edit-father').value);
+                formData.append('motherName', document.getElementById('edit-mother').value);
+                formData.append('dept', document.getElementById('edit-dept').value);
+                formData.append('year', document.getElementById('edit-year').value);
+                formData.append('phone', document.getElementById('edit-phone').value);
+                
+                const photo = document.getElementById('edit-photo-file').files[0];
+                const mark = document.getElementById('edit-mark-file').files[0];
+                if(photo) formData.append('photo', photo);
+                if(mark) formData.append('marksheet', mark);
+                
+                return formData;
+            }
+        });
+
+        if (formValues) {
+            Swal.fire({ title: 'Updating...', didOpen: () => Swal.showLoading() });
+            try {
+                const res = await fetch(`${API_BASE}/admin/full_edit_id_app`, {
+                    method: 'POST',
+                    body: formValues 
+                });
+                const data = await res.json();
+                if(data.success) {
+                    Swal.fire('Updated!', 'Student records and documents updated.', 'success');
+                    loadPendingStudents();
+                }
+            } catch (err) { Swal.fire('Error', 'Update failed', 'error'); }
+        }
+    }
+
+    async function updateStatus(id, status) {
+        try {
+            const res = await fetch(`${API_BASE}/admin/update_id_status`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id, status })
+            });
+            if((await res.json()).success) {
+                Swal.fire('Done!', `Status: ${status}`, 'success');
+                loadPendingStudents();
+            }
+        } catch(err) { Swal.fire('Error', 'Action failed', 'error'); }
+    }
+
+    window.onload = loadPendingStudents;
+</script>
+</body>
+</html>

@@ -1,0 +1,336 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Settings | COE Assistant</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        :root {
+            --bg: #f0f2f5;
+            --card: #ffffff;
+            --text: #1a1a1b;
+            --accent: #6a11cb;
+            --accent-gradient: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            --border: rgba(0, 0, 0, 0.1);
+            --shadow: 0 10px 30px rgba(0,0,0,0.05);
+        }
+
+        body.dark-theme {
+            --bg: #0f172a;
+            --card: #1e293b;
+            --text: #f1f5f9;
+            --border: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Segoe UI', sans-serif;
+            margin: 0;
+            padding: 0;
+            transition: 0.3s;
+        }
+
+        .settings-nav { max-width: 1200px; margin: 20px auto 0; padding: 0 20px; }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 20px;
+            background: var(--card);
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 600;
+            border-radius: 50px;
+            box-shadow: var(--shadow);
+            transition: 0.3s;
+            border: 1px solid var(--border);
+        }
+
+        .back-btn:hover { transform: translateX(-5px); background: var(--accent); color: white; }
+
+        .settings-wrapper {
+            max-width: 1100px;
+            margin: 30px auto;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 1fr 1.5fr;
+            gap: 30px;
+        }
+
+        .profile-hero {
+            background: var(--card);
+            padding: 40px;
+            border-radius: 25px;
+            text-align: center;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            height: fit-content;
+        }
+
+        .avatar {
+            width: 100px; height: 100px;
+            background: var(--accent-gradient);
+            color: white;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 40px; font-weight: bold;
+            margin: 0 auto 15px;
+            border: 4px solid white;
+            box-shadow: 0 10px 20px rgba(106, 17, 203, 0.2);
+        }
+
+        .settings-content { display: flex; flex-direction: column; gap: 20px; }
+
+        .info-card {
+            background: var(--card);
+            padding: 30px;
+            border-radius: 25px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+        }
+
+        .info-item {
+            display: flex; justify-content: space-between;
+            padding: 15px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .info-item:last-child { border: none; }
+        .label { font-weight: 600; color: var(--accent); }
+
+        .action-item {
+            background: var(--card);
+            padding: 20px;
+            border-radius: 20px;
+            display: flex; justify-content: space-between; align-items: center;
+            cursor: pointer;
+            border: 1px solid var(--border);
+            transition: 0.3s;
+        }
+
+        .toggle-switch {
+            width: 50px; height: 26px;
+            background: #ccc;
+            border-radius: 13px;
+            position: relative;
+            transition: 0.3s;
+        }
+
+        .toggle-switch::before {
+            content: '';
+            position: absolute;
+            width: 20px; height: 20px;
+            background: white;
+            border-radius: 50%;
+            top: 3px; left: 3px;
+            transition: 0.3s;
+        }
+
+        .toggle-switch.active { background: #22c55e; }
+        .toggle-switch.active::before { left: 27px; }
+
+        .logout-btn {
+            color: #ff4757; font-weight: bold;
+            border: 2px solid #ff4757;
+            text-align: center;
+            padding: 15px; border-radius: 20px;
+            cursor: pointer; transition: 0.3s;
+            background: transparent; width: 100%; font-size: 16px;
+        }
+
+        .logout-btn:hover { background: #ff4757; color: white; }
+
+        @media (max-width: 850px) {
+            .settings-wrapper { grid-template-columns: 1fr; }
+        }
+     .settings-wrapper {
+         max-width: 1100px;
+         margin: 30px auto;
+         padding: 20px;
+         display: grid;
+        grid-template-columns: 1fr 1.8fr;  
+        gap: 30px;
+        }
+
+
+        @media (max-width: 850px) {
+         .settings-wrapper {
+        grid-template-columns: 1fr;
+        }
+    }
+   
+    </style>
+</head>
+<body>
+
+    <div class="settings-nav">
+        <a href="index.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i> Back to Chat</a>
+    </div>
+
+    <div class="settings-wrapper">
+  <div class="left-column-wrapper" style="display: flex; flex-direction: column; gap: 20px;">
+     
+    <div class="profile-hero">
+        <div class="avatar" id="userInitial">?</div>
+        <h2 id="displayUserName" style="margin-bottom: 5px;">Student Name</h2>
+        <p id="profEmailDisplay" style="color: var(--accent); font-weight: 500; margin: 0; opacity: 0.9;"></p>
+        <p id="currentDate" style="font-size: 0.85rem; opacity: 0.6; margin-top: 15px;"></p>
+    </div> 
+
+    <div class="profile-hero" style="text-align: left; padding: 25px;">
+        <h3 style="margin-top: 0; font-size: 1.1rem; border-bottom: 1px solid var(--border); padding-bottom: 10px;">
+            <i class="fa-solid fa-id-card-clip" style="color: var(--accent);"></i> Identity Services
+        </h3>
+        
+        <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 15px;">
+            <div class="settings-row" onclick="window.location.href='id.html'" style="background: rgba(106, 17, 203, 0.05); padding: 12px; border-radius: 15px; border: 1px dashed var(--accent); cursor: pointer;">
+                <div class="row-info">
+                    <b style="color: var(--accent); font-size: 0.9rem;">Create College ID</b>
+                    <span style="font-size: 0.75rem; opacity: 0.7;">New Registration</span>
+                </div>
+                <i class="fa-solid fa-plus-circle" style="color: var(--accent);"></i>
+            </div>
+
+            <div class="settings-row" onclick="window.location.href='getid.html'" style="background: rgba(34, 197, 94, 0.05); padding: 12px; border-radius: 15px; border: 1px solid #22c55e; cursor: pointer;">
+                <div class="row-info">
+                    <b style="color: #16a34a; font-size: 0.9rem;">Get Identity Card</b>
+                    <span id="statusBadge" style="font-size: 0.75rem; opacity: 0.7;">Check & Download</span>
+                </div>
+                <i class="fa-solid fa-download" style="color: #16a34a;"></i>
+            </div>
+        </div>
+    </div>
+</div>
+   <div class="settings-content">
+            <div class="info-card">
+                <h3 style="margin-top: 0;"><i class="fa-solid fa-user-graduate"></i> Academic Details</h3>
+                <div class="info-item">
+                    <span class="label">Roll Number</span>
+                    <b id="profRoll">--</b>
+                </div>
+                <div class="info-item">
+                    <span class="label">Course</span>
+                    <b id="profCourse">--</b>
+                </div>
+                <div class="info-item">
+                    <span class="label">Phone</span>
+                    <b id="profPhone">--</b>
+                </div>
+            </div>
+
+            <button class="action-item" onclick="window.location.href='result.html'" style="width: 100%; margin-bottom: 10px; border-left: 5px solid #2ecc71;">
+        <div>
+            <b style="display: block;"><i class="fa-solid fa-file-invoice"></i> Get Examination Result</b>
+            <small style="opacity: 0.6;">Check your subject-wise marks and percentage</small>
+        </div>
+        <i class="fa-solid fa-chevron-right"></i>
+    </button>
+
+            <div class="action-item" id="themeRow">
+                <div>
+                    <b style="display: block;">Dark Mode</b>
+                    <small style="opacity: 0.6;">Switch between light and dark themes</small>
+                </div>
+                <div class="toggle-switch" id="themeToggle"></div>
+            </div>
+
+            <div class="settings-content">
+    <button class="action-item" onclick="window.location.href='edit.html'" style="width: 100%; margin-bottom: 10px; border-color: var(--accent); color: var(--accent);">
+        <div>
+            <b style="display: block;"><i class="fa-solid fa-user-pen"></i> Edit Profile Details</b>
+            <small style="opacity: 0.6;">Update your name, roll number, or phone</small>
+        </div>
+        <i class="fa-solid fa-chevron-right"></i>
+    </button>
+
+ 
+
+            <button class="logout-btn" onclick="handleLogout()">
+                <i class="fa-solid fa-right-from-bracket"></i> Logout Account
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. Load Profile & Email ---
+        async function loadUserProfile() {
+            const userEmail = sessionStorage.getItem("user_id");
+            if(!userEmail) {
+          console.warn("No active session. Redirecting...");
+          window.location.href = "login.html";
+          return;
+        } 
+
+            // Display email immediately
+            document.getElementById('profEmailDisplay').innerText = userEmail;
+
+            try {
+                const res = await fetch('http://127.0.0.1:5000/get_profile', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ email: userEmail })
+                });
+                const data = await res.json();
+                
+                if(!data.error) {
+                    document.getElementById('profRoll').innerText = data.roll || "N/A";
+                    document.getElementById('profCourse').innerText = data.course || "N/A";
+                    document.getElementById('profPhone').innerText = data.phone || "N/A";
+                    document.getElementById('displayUserName').innerText = data.name;
+                    
+                    if(data.name) {
+                        document.getElementById('userInitial').innerText = data.name[0].toUpperCase();
+                    }
+                }
+            } catch (err) { console.error("Profile load error:", err); }
+        }
+
+        // --- 2. Initialize Date ---
+        document.getElementById('currentDate').innerText = new Date().toLocaleDateString('en-US', { 
+            weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' 
+        });
+
+        // --- 3. Theme Toggle Functionality ---
+        const themeToggle = document.getElementById('themeToggle');
+        if (localStorage.getItem('theme') === 'dark') {
+            document.body.classList.add('dark-theme');
+            themeToggle.classList.add('active');
+        }
+
+        document.getElementById('themeRow').onclick = () => {
+            themeToggle.classList.toggle('active');
+            const isDark = document.body.classList.toggle('dark-theme');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+        };
+
+        // --- 4. Logout Functionality ---
+        function handleLogout() {
+            Swal.fire({
+                title: 'Logout Account?',
+                text: "Are you sure you want to end your session?",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#ff4757',
+                cancelButtonColor: '#6a11cb',
+                confirmButtonText: '<i class="fa-solid fa-right-from-bracket"></i> Yes, Logout',
+                cancelButtonText: 'Cancel',
+                width: window.innerWidth < 480 ? '90%' : '400px'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    sessionStorage.clear();
+                    window.location.href = 'login.html';
+                }
+            });
+        }
+        loadUserProfile();
+    </script>
+</body>
+</html>
+
+
+
