@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Professional Chat UI</title>
+  <link rel="stylesheet" href="style.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha512-DxV+EoADOkOygM4IR9yXP8Sb2qwgidEmeqAEmDKIOfPRQZOWbXCzLC6vjbZyy0vPisbH2SyW27+ddLVCN+OMzQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+  
+  <!-- Sidebar -->
+  <div class="sidebar" id="sidebar">
+    <div>
+     <h2>COE Hub <i class="fa-solid fa-microchip fa-spin" style="--fa-animation-duration: 3s; color: var(--secondary);"></i></h2>
+      <div class="menu">
+        <div class="menu-item" id="dashboardBtn"><i class="fa-solid fa-house-user"></i> Dashboard</div>
+        <div class="menu-item" id="historyBtn"><i class="fa-solid fa-comment"></i> Chats</div>
+        <div class="menu-item" id="notesBtn"  onclick="window.location.href = 'notes.html'"><i class="fa-solid fa-book"></i> Study Notes</div>
+        <div class="menu-item" onclick="window.location.href='community.html'">
+    <i class="fa-solid fa-users"></i> Community Chat
+</div>
+        <div class="menu-item" id="settingBtn"><i class="fa-solid fa-user-gear"></i> My Profile</div>
+       <div class="menu-item" id="aboutBtn"><i class="fa-solid fa-circle-info"></i> About Us</div>
+      </div>
+    </div>
+        <div class="menu-item" id="logoutBtn" onclick="handleLogout()"> <i class="fa-solid fa-right-from-bracket"></i></i> Logout</div>
+
+  </div>
+
+  <!-- Chat Section -->
+  <div class="chat-container" id="chatContainer">
+    <div class="chat-header">
+  <div class="header-info">
+    <div class="bot-profile">
+      <div class="bot-icon-wrapper">
+        <i class="fa-solid fa-robot"></i>
+        <span class="online-indicator"></span>
+      </div>
+      <div class="bot-details">
+        <span class="bot-name">COE Assistant</span>
+        <span class="bot-status">Always Online</span>
+      </div>
+    </div>
+  </div>
+  
+  <div class="header-actions">
+    <button class="icon-btn" onclick="toggleSidebar()" title="Toggle Menu">
+      <i class="fa-solid fa-bars-staggered"></i>
+    </button>
+  </div>
+</div>
+    <div class="chat-messages" id="chatMessages">
+      <!-- Messages will be appended here -->
+    </div>
+
+    <div class="chat-input">
+      <div class="search-box">
+        <input type="text" placeholder="Type a message..." id="userInput" />
+        <button type="button" id="sendBtn"><i class="fa-solid fa-paper-plane"></i></button>
+    
+      </div>
+    </div>
+  </div>
+  </div> 
+
+  <script src="script.js"></script>
+</body>
+</html>

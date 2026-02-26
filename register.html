@@ -1,0 +1,483 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Student Registration | COE Assistant</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+      :root {
+        --primary: #6a11cb;
+        --secondary: #2575fc;
+        --accent-gradient: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+      }
+
+      * {
+        box-sizing: border-box;
+        font-family: "Plus Jakarta Sans", sans-serif;
+      }
+
+      body {
+        background: url("image/coeimg.jpg") no-repeat center center fixed;
+        background-size: cover;
+        margin: 0;
+        padding: 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+      }
+
+      .reg-container {
+        background: rgba(255, 255, 255, 0);
+        backdrop-filter: blur(5px);
+        -webkit-backdrop-filter: blur(5px);
+        width: 100%;
+        max-width: 800px;
+        padding: 40px;
+        border-radius: 35px;
+        border: 2px solid rgba(255, 255, 255, 0.4);
+        box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4);
+      }
+
+      .header {
+        text-align: center;
+        margin-bottom: 30px;
+      }
+      .header h2 {
+        color: #fff;
+        margin: 0;
+        font-size: 32px;
+        font-weight: 800;
+        text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.8);
+      }
+      .header p {
+        color: #fff;
+        font-size: 16px;
+        text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8);
+      }
+
+      .form-section {
+        margin-bottom: 25px;
+      }
+      .section-title {
+        font-size: 14px;
+        font-weight: 700;
+        color: #fff;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8);
+      }
+
+      .section-title::after {
+        content: "";
+        flex: 1;
+        height: 1px;
+        background: rgba(255, 255, 255, 0.3);
+      }
+
+      .grid-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+      }
+
+      .form-group {
+        margin-bottom: 15px;
+      }
+
+      label {
+        display: block;
+        font-size: 13px;
+        font-weight: 600;
+        margin-bottom: 8px;
+        color: white;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+      }
+
+      input,
+      select {
+        width: 100%;
+        padding: 14px 18px;
+        background: rgba(0, 0, 0, 0.25); /* Transparent Input fields */
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 12px;
+        font-size: 15px;
+        outline: none;
+        color: #fff;
+        transition: 0.3s;
+      }
+
+      input::placeholder {
+        color: #ccc;
+      }
+
+      input:focus,
+      select:focus {
+        border-color: var(--secondary);
+        background: rgba(0, 0, 0, 0.45);
+      }
+
+      /* Radio Buttons Design */
+      .radio-group {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+      }
+
+      .radio-box {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        cursor: pointer;
+        background: rgba(255, 255, 255, 0.1);
+        padding: 14px;
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        transition: 0.3s;
+        font-weight: 600;
+        color: #fff;
+      }
+
+      .radio-box:hover {
+        background: rgba(255, 255, 255, 0.2);
+      }
+
+      .btn-submit {
+        width: 100%;
+        padding: 18px;
+        background: var(--accent-gradient);
+        color: white;
+        border: none;
+        border-radius: 15px;
+        font-weight: 700;
+        cursor: pointer;
+        font-size: 18px;
+        margin-top: 20px;
+        transition: 0.4s;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+      }
+
+      .btn-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 15px 30px rgba(106, 17, 203, 0.4);
+      }
+
+      .footer {
+        text-align: center;
+        margin-top: 25px;
+        font-size: 15px;
+        color: #fff;
+        text-shadow: 1px 1px 2px #000;
+      }
+
+      .footer a {
+        color: #fff;
+        text-decoration: underline;
+        font-weight: 700;
+      }
+
+      /* Mobile Responsiveness */
+      @media (max-width: 768px) {
+        .reg-container {
+          padding: 25px 20px;
+        }
+        .grid-row,
+        .radio-group {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="reg-container">
+      <div class="header">
+        <h2>COE Enrollment Form</h2>
+        <p>Govt. College Sanjauli</p>
+      </div>
+
+      <form id="regForm">
+        <div class="form-section">
+          <div class="section-title">
+            <i class="fa-solid fa-user"></i> Personal Details
+          </div>
+          <div class="form-group">
+            <label>Full Name</label>
+            <input type="text" id="name" placeholder="John Doe" required />
+          </div>
+          <div class="grid-row">
+            <div class="form-group">
+              <label>Date of Birth</label>
+              <input type="date" id="dob" required />
+            </div>
+            <div class="form-group">
+              <label>Gender</label>
+              <select id="gender" required>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <div class="section-title">
+            <i class="fa-solid fa-circle-question"></i> Are you a Student?
+          </div>
+          <div class="radio-group">
+            <label class="radio-box">
+              <input
+                type="radio"
+                name="userRole"
+                value="student"
+                checked
+                onclick="toggleAcademic(true)"
+              />
+              <span>Yes, I am a Student</span>
+            </label>
+            <label class="radio-box">
+              <input
+                type="radio"
+                name="userRole"
+                value="guest"
+                onclick="toggleAcademic(false)"
+              />
+              <span>No, I am a Guest</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="form-section" id="academicSection">
+          <div class="section-title">
+            <i class="fa-solid fa-graduation-cap"></i> Academic Info
+          </div>
+          <div class="grid-row">
+            <div class="form-group">
+              <label>College Roll No.</label>
+              <input
+                type="text"
+                id="roll"
+                placeholder="Min. 8 digits required"
+                minlength="8"
+                oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label>Course</label>
+              <select id="course">
+                <option value="BCA">BCA</option>
+                <option value="B.Sc">B.Sc</option>
+                <option value="B.A">B.A</option>
+                <option value="B.Com">B.Com</option>
+                <option value="BBA">BBA</option>
+                <option value="PGDCA">PGDCA</option>
+                <option value="B.VOC">B.VOC</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <div class="section-title">
+            <i class="fa-solid fa-envelope"></i> Contact Info
+          </div>
+          <div class="grid-row">
+            <div class="form-group">
+              <label>Email ID</label>
+              <input
+                type="email"
+                id="email"
+                placeholder="example@email.com"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label>Phone Number</label>
+              <input
+                type="tel"
+                id="phone"
+                placeholder="10-digit mobile number"
+                pattern="[0-9]{10}"
+                oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+                required
+              />
+            </div>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-submit" id="submitBtn">
+          Create My Account
+        </button>
+      </form>
+
+      <div class="footer">
+        Already registered? <a href="login.html">Login here</a>
+      </div>
+    </div>
+
+    <script>
+      // 1. Function to show/hide Academic Section
+      function toggleAcademic(isStudent) {
+        const section = document.getElementById("academicSection");
+        const rollInput = document.getElementById("roll");
+        const submitBtn = document.getElementById("submitBtn");
+
+        if (isStudent) {
+          section.style.display = "block";
+          rollInput.required = true;
+          submitBtn.innerText = "Create Student ID";
+        } else {
+          section.style.display = "none";
+          rollInput.required = false;
+          rollInput.value = "";
+          submitBtn.innerText = "Register as Guest";
+        }
+      }
+
+      // Default required state
+      document.getElementById("roll").required = true;
+
+      // 2. Form Submission Handler
+      document
+        .getElementById("regForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+
+          const btn = document.getElementById("submitBtn");
+          const originalText = btn.innerText;
+          const phone = document.getElementById("phone").value;
+
+          const isStudent =
+            document.querySelector('input[name="userRole"]:checked').value ===
+            "student";
+
+          if (phone.length !== 10) {
+            Swal.fire(
+              "Validation Error",
+              "Mobile number must be exactly 10 digits.",
+              "warning",
+            );
+            return;
+          }
+          // Roll Number Validation
+          const rollInput = document.getElementById("roll");
+          if (isStudent && rollInput.value.trim().length < 8) {
+            Swal.fire(
+              "Validation Error",
+              "College Roll Number must be at least 8 digits long.",
+              "warning",
+            );
+            return;
+          }
+
+          btn.innerHTML =
+            '<i class="fas fa-spinner fa-spin"></i> Processing...';
+          btn.disabled = true;
+
+          const formData = {
+            name: document.getElementById("name").value,
+            dob: document.getElementById("dob").value,
+            gender: document.getElementById("gender").value,
+            roll: isStudent ? document.getElementById("roll").value : "GUEST",
+            course: isStudent
+              ? document.getElementById("course").value
+              : "Guest User",
+            email: document.getElementById("email").value,
+            phone: phone,
+          };
+
+          try {
+            const res = await fetch("http://127.0.0.1:5000/register", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(formData),
+            });
+
+            const data = await res.json();
+            if (data.success) {
+              Swal.fire({
+                title:
+                  '<span style="color: #6a11cb; font-weight: 800;">Registration Successful!</span>',
+                icon: "success",
+                iconColor: "#2575fc",
+                html: `
+            <div style="text-align: left; padding: 15px; background: #fdfdfd; border-radius: 18px; border: 1px dashed #6a11cb; margin-top: 15px;">
+                <p style="margin-bottom: 15px; color: #475569; font-size: 14px; text-align: center;">
+                    Welcome to <b>COE Assistant</b>! Please save your login credentials carefully:
+                </p>
+                
+                <div style="display: flex; align-items: center; background: #f1f5f9; padding: 12px; border-radius: 12px; margin-bottom: 12px;">
+                    <div style="background: #6a11cb; color: white; width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-right: 12px;">
+                        <i class="fa-solid fa-envelope"></i>
+                    </div>
+                    <div>
+                        <small style="color: #64748b; font-weight: 700; text-transform: uppercase; font-size: 10px;">User ID / Email</small><br>
+                        <span style="font-size: 15px; font-weight: 700; color: #1e293b;">${data.userId}</span>
+                    </div>
+                </div>
+
+                <div style="display: flex; align-items: center; background: #f1f5f9; padding: 12px; border-radius: 12px;">
+                    <div style="background: #2575fc; color: white; width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-right: 12px;">
+                        <i class="fa-solid fa-key"></i>
+                    </div>
+                    <div>
+                        <small style="color: #64748b; font-weight: 700; text-transform: uppercase; font-size: 10px;">Password (D.O.B)</small><br>
+                        <span style="font-size: 15px; font-weight: 700; color: #1e293b;">${data.password}</span>
+                    </div>
+                </div>
+                
+                <p style="margin-top: 15px; font-size: 12px; color: #ef4444; text-align: center; font-weight: 600;">
+                    <i class="fa-solid fa-circle-info"></i> Use your Date of Birth as your initial password.
+                </p>
+            </div>
+        `,
+                confirmButtonText:
+                  '<i class="fa-solid fa-right-to-bracket"></i> Proceed to Login',
+                confirmButtonColor: "#6a11cb",
+                backdrop: `rgba(106, 17, 203, 0.3)`,
+                showClass: {
+                  popup: "animate__animated animate__fadeInDown",
+                },
+                hideClass: {
+                  popup: "animate__animated animate__fadeOutUp",
+                },
+                allowOutsideClick: false,
+              }).then(() => {
+                window.location.href = "login.html";
+              });
+            } else {
+              Swal.fire(
+                "Registration Failed",
+                data.message || "Error occurred.",
+                "error",
+              );
+              btn.innerText = originalText;
+              btn.disabled = false;
+            }
+          } catch (err) {
+            Swal.fire(
+              "Connection Error",
+              "Backend server is not responding.",
+              "error",
+            );
+            btn.innerText = originalText;
+            btn.disabled = false;
+          }
+        });
+    </script>
+  </body>
+</html>

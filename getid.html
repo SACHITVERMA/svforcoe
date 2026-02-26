@@ -1,0 +1,521 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ID Card History | COE</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <style>
+      :root {
+        --primary: #1a2a6c;
+        --gold: #f1c40f;
+        --accent: #6a11cb;
+      }
+
+      body {
+        font-family: "Segoe UI", sans-serif;
+        background: #f0f2f5;
+        margin: 0;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .history-container {
+        width: 100%;
+        max-width: 800px;
+        background: white;
+        padding: 30px;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        margin-bottom: 30px;
+        box-sizing: border-box;
+      }
+
+      .id-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px;
+        border-bottom: 1px solid #eee;
+        transition: 0.3s;
+        flex-wrap: wrap;
+        gap: 15px;
+      }
+
+      .id-item:hover {
+        background: #f9fafb;
+        border-radius: 12px;
+      }
+
+      /* --- ID CARD SHARED STYLES --- */
+      .id-card-wrapper {
+        padding: 15px;
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
+        margin-bottom: 25px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+      }
+
+      .id-card,
+      .id-card-back {
+        width: 350px;
+        height: 220px; /* Fixed Height for both sides */
+        background: #fff;
+        border-radius: 12px;
+        overflow: hidden;
+        border: 1px solid #ddd;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        box-sizing: border-box;
+      }
+
+      /* --- FRONT SIDE STYLES --- */
+      .card-header {
+        background: var(--primary);
+        color: white;
+        padding: 10px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        height: 60px;
+        box-sizing: border-box;
+      }
+
+      .logo {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: white;
+        overflow: hidden;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .college-name {
+        font-size: 12px;
+        font-weight: bold;
+        line-height: 1.2;
+      }
+
+      .card-body {
+        display: flex;
+        padding: 10px;
+        gap: 12px;
+        flex: 1;
+      }
+
+      .photo-area {
+        width: 80px;
+        height: 100px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        overflow: hidden;
+        background: #f4f4f4;
+      }
+
+      #displayPhoto {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .details {
+        flex: 1;
+        font-size: 11px;
+        line-height: 1.6;
+      }
+
+      .details b {
+        color: var(--primary);
+        width: 60px;
+        display: inline-block;
+      }
+
+      .qr-section {
+        position: absolute;
+        right: 10px;
+        bottom: 40px;
+      }
+
+      .card-footer {
+        background: var(--gold);
+        height: 25px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 11px;
+        font-weight: bold;
+        color: var(--primary);
+        width: 100%;
+      }
+
+      /* --- BACK SIDE STYLES --- */
+      .id-card-back {
+        background-color: #f8f9fa;
+      }
+
+      .watermark-container {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-content: center;
+        opacity: 0.05;
+        pointer-events: none;
+        user-select: none;
+        transform: rotate(-25deg) scale(1.2);
+        z-index: 1;
+      }
+
+      .watermark-text {
+        font-size: 10px;
+        font-weight: bold;
+        color: var(--primary);
+        padding: 8px;
+        white-space: nowrap;
+      }
+
+      .back-content {
+        position: relative;
+        z-index: 2;
+        padding: 10px;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .instructions {
+        text-align: left;
+        font-size: 8.5px;
+        color: #444;
+        margin: 5px 0;
+        line-height: 1.3;
+      }
+
+      /* Compact Contact & Authority Row */
+      .back-bottom-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        margin-top: auto;
+        padding-bottom: 5px;
+      }
+
+      .contact-info {
+        font-size: 8px;
+        color: #333;
+        line-height: 1.2;
+      }
+
+      .authority-group {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .stamp-box {
+        width: 35px;
+        height: 35px;
+        border: 1px dashed #bbb;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 6px;
+        color: #999;
+        text-align: center;
+      }
+
+      .sig-box {
+        text-align: center;
+        border-top: 1px solid var(--primary);
+        width: 80px;
+        padding-top: 2px;
+      }
+
+      .sig-text {
+        font-size: 7.5px;
+        font-weight: bold;
+        color: var(--primary);
+        text-transform: uppercase;
+      }
+
+      /* Buttons & Utility */
+      #cardPreviewSection {
+        display: none;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+      }
+
+      .btn-group {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 50px;
+      }
+
+      .view-btn {
+        background: var(--accent);
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+      }
+
+      .back-link {
+        text-decoration: none;
+        color: var(--primary);
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 0;
+      }
+
+      @media (max-width: 480px) {
+        .id-card,
+        .id-card-back {
+          width: 310px;
+          height: 195px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="history-container" id="historySection">
+      <a href="setting.html" class="back-link">
+        <i class="fa-solid fa-arrow-left"></i> Back to Settings
+      </a>
+      <h2 style="margin-top: 0; color: var(--primary); text-align: center">
+        <i class="fa-solid fa-id-card"></i> ID Card Registry
+      </h2>
+      <hr style="border: 0; border-top: 1px solid #eee; margin-bottom: 20px" />
+      <div id="idList">
+        <p style="text-align: center; color: #888">Checking records...</p>
+      </div>
+    </div>
+
+    <div id="cardPreviewSection">
+      <div class="id-card-wrapper" id="captureArea">
+        <div class="id-card">
+          <div class="card-header">
+            <div class="logo">
+              <img src="image/collegeimg.png" width="40" alt="Logo" />
+            </div>
+            <div class="college-name">
+              CENTRE OF EXCELLENCE<br />
+              <span style="font-size: 9px; font-weight: normal"
+                >Govt. College Sanjauli, Shimla</span
+              >
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="photo-area">
+              <img id="displayPhoto" src="" alt="Student" />
+            </div>
+            <div class="details">
+              <p style="margin: 2px 0">
+                <b>NAME:</b> <span id="displayName">---</span>
+              </p>
+              <p style="margin: 2px 0">
+                <b>ROLL NO:</b> <span id="displayRoll">---</span>
+              </p>
+              <p style="margin: 2px 0">
+                <b>COURSE:</b> <span id="displayCourse">---</span>
+              </p>
+              <p style="margin: 2px 0">
+                <b>SESSION:</b> <span id="displaySession">---</span>
+              </p>
+              <p style="margin: 2px 0">
+                <b>STD-ID:</b>
+                <span id="displayUniqueID" style="color: red; font-weight: bold"
+                  >---</span
+                >
+              </p>
+            </div>
+            <div class="qr-section">
+              <div id="qrcode"></div>
+            </div>
+          </div>
+          <div class="card-footer">ACADEMIC IDENTITY CARD</div>
+        </div>
+
+        <div class="id-card-back">
+          <div class="watermark-container" id="watermarkGrid"></div>
+
+          <div
+            class="card-header"
+            style="justify-content: center; height: 40px"
+          >
+            <div class="logo">
+              <img src="image/collegeimg.png" width="40" alt="Logo" />
+            </div>
+          </div>
+
+          <div class="back-content">
+            <div
+              style="
+                font-weight: bold;
+                color: var(--primary);
+                font-size: 13px;
+                text-align: center;
+              "
+            >
+              CENTRE OF EXCELLENCE
+            </div>
+
+            <div class="instructions">
+              <p style="margin: 0 0 2px 0"><b>Terms & Conditions:</b></p>
+              <ul style="padding-left: 15px; margin: 0">
+                <li>This card is non-transferable property of COE.</li>
+                <li>Loss must be reported to the office immediately.</li>
+                <li>Always carry this card in college premises.</li>
+              </ul>
+            </div>
+
+            <div class="back-bottom-row">
+              <div class="contact-info">
+                <b>Contact:</b> 0177-2640332<br />
+                Shimla, Himachal Pradesh
+              </div>
+              <div class="authority-group">
+                <div class="stamp-box">OFFICE<br />STAMP</div>
+                <div class="sig-box">
+                  <div class="sig-text">Authority</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="card-footer">G.C. SANJAULI, SHIMLA</div>
+        </div>
+      </div>
+
+      <div class="btn-group">
+        <button
+          class="view-btn"
+          style="background: #64748b"
+          onclick="location.reload()"
+        >
+          <i class="fa-solid fa-arrow-left"></i> Back to List
+        </button>
+        <button class="view-btn" onclick="downloadPDF()">
+          <i class="fa-solid fa-download"></i> Download PDF
+        </button>
+      </div>
+    </div>
+
+    <script>
+      const API_BASE = "http://127.0.0.1:5000";
+
+      async function loadIDHistory() {
+        const email = sessionStorage.getItem("user_id");
+        if (!email) {
+          window.location.href = "login.html";
+          return;
+        }
+
+        try {
+          const res = await fetch(`${API_BASE}/api/get_all_ids?email=${email}`);
+          const data = await res.json();
+          const listDiv = document.getElementById("idList");
+
+          if (data.success && data.cards.length > 0) {
+            listDiv.innerHTML = data.cards
+              .map(
+                (card) => `
+                        <div class="id-item">
+                            <div class="id-info">
+                                <b>Session: ${card.academic_year}</b>
+                                <span>ID: ${card.unique_id || "Pending"} | Status: 
+                                    <span style="color: ${card.status === "Approved" ? "#2ecc71" : "#f39c12"}">${card.status}</span>
+                                </span>
+                            </div>
+                            <button class="view-btn" onclick='showCard(${JSON.stringify(card)})' 
+                                ${card.status !== "Approved" ? 'disabled style="background:#ccc;"' : ""}>
+                                ${card.status === "Approved" ? '<i class="fa-solid fa-eye"></i> View' : "Pending"}
+                            </button>
+                        </div>
+                    `,
+              )
+              .join("");
+          } else {
+            listDiv.innerHTML =
+              "<p style='text-align:center'>No records found.</p>";
+          }
+        } catch (e) {
+          document.getElementById("idList").innerHTML =
+            "<p style='color:red'>Server Error.</p>";
+        }
+      }
+
+      function showCard(card) {
+        document.getElementById("historySection").style.display = "none";
+        document.getElementById("cardPreviewSection").style.display = "flex";
+
+        // Map Data
+        document.getElementById("displayName").innerText = card.full_name;
+        document.getElementById("displayRoll").innerText = card.roll_no;
+        document.getElementById("displayCourse").innerText = card.department;
+        document.getElementById("displaySession").innerText =
+          card.academic_year;
+        document.getElementById("displayUniqueID").innerText = card.unique_id;
+        document.getElementById("displayPhoto").src =
+          `${API_BASE}/static/uploads/id_docs/${card.photo_path}`;
+
+        // Generate Watermarks for Back Side
+        const watermarkGrid = document.getElementById("watermarkGrid");
+        watermarkGrid.innerHTML = "";
+        for (let i = 0; i < 15; i++) {
+          const span = document.createElement("span");
+          span.className = "watermark-text";
+          span.innerText = "CENTRE OF EXCELLENCE";
+          watermarkGrid.appendChild(span);
+        }
+
+        // Generate QR Code
+        document.getElementById("qrcode").innerHTML = "";
+        new QRCode(document.getElementById("qrcode"), {
+          text: `ID: ${card.unique_id}\nName: ${card.full_name}\nRoll: ${card.roll_no}\nCourse: ${card.department}\nSession: ${card.academic_year}\nPhone :${card.phone}`,
+          width: 50,
+          height: 50,
+        });
+      }
+
+      function downloadPDF() {
+        const element = document.getElementById("captureArea");
+        const roll = document.getElementById("displayRoll").innerText;
+        const opt = {
+          margin: 10,
+          filename: `ID_Card_${roll}.pdf`,
+          image: { type: "jpeg", quality: 0.98 },
+          html2canvas: { scale: 3, useCORS: true },
+          jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
+        };
+        html2pdf().set(opt).from(element).save();
+      }
+
+      window.onload = loadIDHistory;
+    </script>
+  </body>
+</html>

@@ -1,0 +1,494 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Secure Login | COE Assistant</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+      :root {
+        --primary: #6a11cb;
+        --secondary: #2575fc;
+        --admin-color: #ff4757;
+        --bg: #f8f9fa;
+      }
+
+      * {
+        box-sizing: border-box;
+        font-family: "Inter", "Segoe UI", sans-serif;
+      }
+
+      body {
+        background: url("image/geminicoeimg.png") no-repeat center center fixed;
+        background-size: cover;
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        min-height: 100vh;
+        margin: 0;
+        padding-right: 80px;
+      }
+
+      .auth-card {
+        background: rgba(255, 255, 255, 0);
+        backdrop-filter: none;
+
+        width: 100%;
+        max-width: 400px;
+        padding: 40px;
+        border-radius: 24px;
+        border: 2px solid rgba(255, 255, 255, 0.4);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        transition: all 0.4s ease;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .auth-card.admin-mode {
+        border-top: 6px solid var(--admin-color);
+      }
+
+      .header {
+        text-align: center;
+        margin-bottom: 30px;
+      }
+      .header h2 {
+        margin: 0;
+        color: #87ceeb;
+        font-size: 26px;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+      }
+      .header p {
+        color: #070707;
+        font-size: 14px;
+        margin-top: 8px;
+        text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8);
+      }
+
+      .form-group {
+        margin-bottom: 20px;
+        position: relative;
+      }
+      label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: #272626;
+        font-size: 14px;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+      }
+
+      .input-wrapper {
+        position: relative;
+      }
+      .input-wrapper i {
+        position: absolute;
+        left: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #fff;
+        transition: 0.3s;
+      }
+
+      input {
+        width: 100%;
+        padding: 14px 14px 14px 45px;
+        background: rgba(0, 0, 0, 0.2);
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-radius: 12px;
+        outline: none;
+        font-size: 15px;
+        color: #fff;
+        transition: 0.3s;
+      }
+
+      input::placeholder {
+        color: #ddd;
+      }
+      input:focus {
+        border-color: var(--primary);
+        background: rgba(0, 0, 0, 0.4);
+      }
+
+      .links-container {
+        display: flex;
+        justify-content: space-between;
+        margin-top: -10px;
+        margin-bottom: 20px;
+      }
+      .links-container a {
+        font-size: 13px;
+        color: #100f0f;
+        text-decoration: none;
+        text-shadow: 1px 1px 2px #000;
+      }
+      .links-container a:hover {
+        color: var(--secondary);
+        text-decoration: underline;
+      }
+
+      .btn {
+        width: 100%;
+        padding: 15px;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-weight: bold;
+        cursor: pointer;
+        font-size: 16px;
+        transition: 0.3s;
+        margin-top: 10px;
+      }
+
+      .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(106, 17, 203, 0.5);
+      }
+      .btn.admin-btn {
+        background: linear-gradient(135deg, var(--admin-color), #ff6b81);
+      }
+
+      .footer {
+        text-align: center;
+        margin-top: 25px;
+        font-size: 14px;
+        color: #fff;
+        text-shadow: 1px 1px 2px #000;
+      }
+      .footer a {
+        color: #0873f6;
+        text-decoration: underline;
+        font-weight: bold;
+      }
+
+      .admin-toggle {
+        display: inline-block;
+        margin-top: 15px;
+        padding: 8px 16px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 20px;
+        cursor: pointer;
+        font-size: 12px;
+        font-weight: 700;
+        color: #fff;
+        transition: 0.3s;
+      }
+
+      .admin-toggle:hover {
+        background: rgba(255, 255, 255, 0.4);
+      }
+
+      @media (max-width: 768px) {
+        body {
+          padding: 15px;
+          justify-content: center;
+          padding-right: 0;
+        }
+        .auth-card {
+          padding: 30px 20px;
+          border-radius: 20px;
+          max-width: 100%;
+        }
+        .form-group {
+          margin-bottom: 20px;
+          position: relative;
+        }
+        label {
+          display: block;
+          margin-bottom: 8px;
+          font-weight: 600;
+          color: #fcfcfc;
+          font-size: 14px;
+          text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+        }
+
+        .links-container a {
+          font-size: 13px;
+          color: #fcfcfc;
+          text-decoration: none;
+          text-shadow: 1px 1px 2px #000;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="auth-card" id="loginCard">
+      <div class="header">
+        <h2 id="loginTitle">Student Login</h2>
+        <p id="loginSubtitle">Access your COE Assistant Dashboard</p>
+      </div>
+
+      <form id="loginForm">
+        <div class="form-group">
+          <label id="userLabel">User ID / Email</label>
+          <div class="input-wrapper">
+            <i class="fa-solid fa-envelope"></i>
+            <input
+              type="text"
+              id="userId"
+              placeholder="student@email.com"
+              required
+            />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Password</label>
+          <div class="input-wrapper">
+            <i class="fa-solid fa-lock"></i>
+            <input
+              type="password"
+              id="password"
+              placeholder="YYYYMMDD"
+              required
+            />
+          </div>
+        </div>
+
+        <div class="links-container">
+          <a href="javascript:void(0)" onclick="handleForgotUserID()"
+            >Forgot User ID?</a
+          >
+          <a href="javascript:void(0)" onclick="handleForgotPassword()"
+            >Forgot Password?</a
+          >
+        </div>
+
+        <button type="submit" class="btn" id="loginBtn">Sign In</button>
+      </form>
+
+      <div class="footer">
+        Don't have an account? <a href="register.html">Register Now</a>
+        <br />
+        <div
+          class="admin-toggle"
+          onclick="toggleAdminMode()"
+          id="adminToggleBtn"
+        >
+          <i class="fa-solid fa-user-shield"></i> Switch to Admin Login
+        </div>
+      </div>
+    </div>
+
+    <script>
+      let isAdminMode = false;
+
+      // --- Admin/Student Mode Toggle ---
+      function toggleAdminMode() {
+        isAdminMode = !isAdminMode;
+        const card = document.getElementById("loginCard");
+        const title = document.getElementById("loginTitle");
+        const subtitle = document.getElementById("loginSubtitle");
+        const toggleBtn = document.getElementById("adminToggleBtn");
+        const loginBtn = document.getElementById("loginBtn");
+        const userInput = document.getElementById("userId");
+
+        if (isAdminMode) {
+          card.classList.add("admin-mode");
+          title.innerText = "Admin Portal";
+          subtitle.innerText = "System Authorization Required";
+          toggleBtn.innerHTML =
+            '<i class="fa-solid fa-graduation-cap"></i> Switch to Student Login';
+          loginBtn.classList.add("admin-btn");
+          userInput.placeholder = "admin@coe.control";
+        } else {
+          card.classList.remove("admin-mode");
+          title.innerText = "Student Login";
+          subtitle.innerText = "Access your COE Assistant Dashboard";
+          toggleBtn.innerHTML =
+            '<i class="fa-solid fa-user-shield"></i> Switch to Admin Login';
+          loginBtn.classList.remove("admin-btn");
+          userInput.placeholder = "student@email.com";
+        }
+      }
+
+      // --- Login Form Logic ---
+      document.getElementById("loginForm").onsubmit = async (e) => {
+        e.preventDefault();
+        const userId = document.getElementById("userId").value.trim();
+        const password = document.getElementById("password").value.trim();
+        const loginBtn = document.getElementById("loginBtn");
+        loginBtn.innerText = "Verifying...";
+        loginBtn.disabled = true;
+
+        try {
+          const res = await fetch("http://127.0.0.1:5000/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ userId, password }),
+          });
+          const data = await res.json();
+          if (data.success) {
+            if (data.isAdmin && !isAdminMode) {
+              Swal.fire({
+                icon: "warning",
+                title: "Access Denied!",
+                text: "Please switch to 'Admin Login' mode.",
+                confirmButtonColor: "#6a11cb",
+              });
+              loginBtn.innerText = "Sign In";
+              loginBtn.disabled = false;
+              return;
+            }
+            if (!data.isAdmin && isAdminMode) {
+              Swal.fire({
+                icon: "error",
+                title: "Restricted!",
+                text: "This portal is only for authorized administrators.",
+                confirmButtonColor: "#ff4757",
+              });
+              loginBtn.innerText = "Sign In";
+              loginBtn.disabled = false;
+              return;
+            }
+            sessionStorage.setItem("user_id", userId);
+            sessionStorage.setItem("user_name", data.userName);
+            window.location.href = data.isAdmin ? "admin.html" : "index.html";
+          } else {
+            Swal.fire({
+              icon: "error",
+              title: "Login Failed",
+              text: data.message || "Invalid credentials.",
+              confirmButtonColor: "#6a11cb",
+            });
+            loginBtn.innerText = "Sign In";
+            loginBtn.disabled = false;
+          }
+        } catch (err) {
+          Swal.fire({
+            icon: "error",
+            title: "Connection Error",
+            text: "Failed to connect to the server.",
+            confirmButtonColor: "#6a11cb",
+          });
+          loginBtn.innerText = "Sign In";
+          loginBtn.disabled = false;
+        }
+      };
+
+      // --- 1. Fixed Forgot User ID Function ---
+      async function handleForgotUserID() {
+        const { value: formValues } = await Swal.fire({
+          title: "Recover User ID",
+          html:
+            '<input id="swal-name" class="swal2-input" placeholder="Full Name (Optional)">' +
+            '<input id="swal-roll" class="swal2-input" placeholder="Roll Number (Mandatory)">' +
+            '<input id="swal-course" class="swal2-input" placeholder="Course e.g. BCA (Mandatory)">',
+          focusConfirm: false,
+          showCancelButton: true,
+          confirmButtonText: "Find ID",
+          confirmButtonColor: "#2575fc",
+          preConfirm: () => {
+            const name = document.getElementById("swal-name").value;
+            const roll = document.getElementById("swal-roll").value;
+            const course = document.getElementById("swal-course").value;
+
+            if (!roll || !course) {
+              Swal.showValidationMessage(
+                "Roll Number and Course are mandatory",
+              );
+              return false;
+            }
+            return { name, roll, course };
+          },
+        });
+
+        if (formValues) {
+          Swal.fire({
+            title: "Searching...",
+            didOpen: () => {
+              Swal.showLoading();
+            },
+          });
+          try {
+            const res = await fetch("http://127.0.0.1:5000/forgot_userid", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(formValues),
+            });
+            const data = await res.json();
+            if (data.success) {
+              Swal.fire({
+                icon: "success",
+                title: "User ID Found",
+                html: `Your User ID is: <br><b style="font-size: 1.4rem; color: #2575fc;">${data.userId}</b>`,
+                confirmButtonColor: "#2575fc",
+              });
+            } else {
+              Swal.fire({
+                icon: "error",
+                title: "Not Found",
+                text: data.message || "Record doesn't exist.",
+              });
+            }
+          } catch (err) {
+            Swal.fire({
+              icon: "error",
+              title: "Error",
+              text: "Server connection failed.",
+            });
+          }
+        }
+      }
+
+      // --- 2. Fixed & Un-commented Forgot Password Function ---
+      async function handleForgotPassword() {
+        const { value: email } = await Swal.fire({
+          title: "Recover Password",
+          input: "email",
+          inputLabel: "Enter your registered Email (User ID)",
+          inputPlaceholder: "student@email.com",
+          showCancelButton: true,
+          confirmButtonColor: "#6a11cb",
+          inputValidator: (value) => {
+            if (!value) {
+              return "You need to enter your email!";
+            }
+          },
+        });
+
+        if (email) {
+          Swal.fire({
+            title: "Checking...",
+            didOpen: () => {
+              Swal.showLoading();
+            },
+          });
+          try {
+            const res = await fetch("http://127.0.0.1:5000/forgot_password", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ email: email }),
+            });
+            const data = await res.json();
+            if (data.success) {
+              Swal.fire({
+                icon: "success",
+                title: "Password Recovered",
+                html: `Your password is: <b style="font-size: 1.2rem; color: #6a11cb;">${data.password}</b>`,
+                confirmButtonColor: "#6a11cb",
+              });
+            } else {
+              Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: data.message || "Email not found.",
+              });
+            }
+          } catch (err) {
+            Swal.fire({
+              icon: "error",
+              title: "Error",
+              text: "Connection to server failed.",
+            });
+          }
+        }
+      }
+    </script>
+  </body>
+</html>

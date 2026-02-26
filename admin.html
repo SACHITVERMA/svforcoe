@@ -1,0 +1,476 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Dashboard | COE Hub</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+      :root {
+        --primary: #6a11cb;
+        --danger: #ff4757;
+        --success: #2ecc71;
+        --warning: #f1c40f;
+        --info: #3498db;
+        --text-dark: #1e293b;
+      }
+
+      body {
+        background: #f4f7f6;
+        font-family: "Segoe UI", sans-serif;
+        margin: 0;
+        padding: 20px;
+        color: var(--text-dark);
+      }
+
+      .container {
+        max-width: 1350px;
+        margin: auto;
+      }
+
+      .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+      }
+
+      .top-nav-grid {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 15px;
+        margin-bottom: 30px;
+      }
+
+      .nav-card {
+        background: white;
+        padding: 20px 15px;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        border-bottom: 4px solid var(--primary);
+        text-align: center;
+        transition: 0.3s;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        height: 170px;
+      }
+
+      .nav-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+      }
+
+      .nav-card i {
+        font-size: 26px;
+        margin-bottom: 10px;
+      }
+      .nav-card h3 {
+        font-size: 15px;
+        margin: 5px 0;
+        font-weight: 800;
+      }
+      .nav-card p {
+        font-size: 11px;
+        color: #64748b;
+        margin-bottom: 12px;
+        line-height: 1.3;
+      }
+
+      .btn-nav {
+        padding: 8px;
+        border-radius: 6px;
+        border: none;
+        color: white;
+        font-size: 12px;
+        font-weight: bold;
+        cursor: pointer;
+        text-decoration: none;
+        transition: 0.2s;
+      }
+
+      .btn-nav:hover {
+        opacity: 0.9;
+      }
+
+      /* --- TABLE & SEARCH CARDS --- */
+      .card {
+        background: white;
+        border-radius: 15px;
+        padding: 25px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        margin-bottom: 25px;
+        border: 1px solid #eee;
+      }
+
+      .table-responsive {
+        overflow-x: auto;
+        border-radius: 12px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 1000px;
+      }
+      th,
+      td {
+        padding: 15px;
+        text-align: left;
+        border-bottom: 1px solid #f1f5f9;
+      }
+      th {
+        background: var(--primary);
+        color: white;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .action-btn {
+        padding: 6px 10px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        color: white;
+        margin-right: 4px;
+      }
+
+      .search-bar {
+        padding: 12px;
+        border: 1.5px solid #e2e8f0;
+        border-radius: 10px;
+        width: 300px;
+        outline: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1 style="font-weight: 800">
+          <i class="fa-solid fa-gauge-high"></i> COE Admin Command Center
+        </h1>
+        <button
+          class="btn-nav"
+          style="background: var(--danger); padding: 10px 25px"
+          onclick="adminLogout()"
+        >
+          Logout
+        </button>
+      </div>
+
+      <div class="top-nav-grid">
+        <div class="nav-card" style="border-bottom-color: var(--success)">
+          <i
+            class="fa-solid fa-graduation-cap"
+            style="color: var(--success)"
+          ></i>
+          <h3>Marks Hub</h3>
+          <p>Bulk import results & individual score management.</p>
+          <a
+            href="admin_marks.html"
+            class="btn-nav"
+            style="background: var(--success)"
+            >Manage Marks</a
+          >
+        </div>
+
+        <div class="nav-card" style="border-bottom-color: var(--info)">
+          <i class="fa-solid fa-brain" style="color: var(--info)"></i>
+          <h3>AI Knowledge</h3>
+          <p>Train Chatbot with PDFs & manage knowledge docs.</p>
+          <a
+            href="admin_ai_docs.html"
+            class="btn-nav"
+            style="background: var(--info)"
+            >Train AI</a
+          >
+        </div>
+
+        <div class="nav-card" style="border-bottom-color: var(--warning)">
+          <i class="fa-solid fa-calendar-alt" style="color: var(--warning)"></i>
+          <h3>Timetable</h3>
+          <p>Update class schedules & room assignments.</p>
+          <a
+            href="admin_timetable.html"
+            class="btn-nav"
+            style="background: var(--warning); color: #000"
+            >Set Schedule</a
+          >
+        </div>
+
+        <div class="nav-card" style="border-bottom-color: var(--primary)">
+          <i class="fa-solid fa-book-open" style="color: var(--primary)"></i>
+          <h3>Notes Registry</h3>
+          <p>Monitor Faculty & Student study materials.</p>
+          <a
+            href="admin_notes.html"
+            class="btn-nav"
+            style="background: var(--primary)"
+            >View Notes</a
+          >
+        </div>
+
+        <div class="nav-card" style="border-bottom-color: #e67e22">
+          <i class="fa-solid fa-id-card" style="color: #e67e22"></i>
+          <h3>ID Verification</h3>
+          <p>Approve/Reject student ID card requests.</p>
+          <a
+            href="student_verification.html"
+            class="btn-nav"
+            style="background: #e67e22"
+            >Verify Cards</a
+          >
+        </div>
+      </div>
+
+      <div class="card">
+        <div
+          style="
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+          "
+        >
+          <h2 style="margin: 0">
+            <i class="fa-solid fa-users"></i> Student Management
+          </h2>
+          <div style="display: flex; gap: 10px">
+            <input
+              type="text"
+              id="searchInput"
+              class="search-bar"
+              placeholder="Search roll or name..."
+              onkeyup="filterTable()"
+            />
+            <select
+              id="courseFilter"
+              class="search-bar"
+              style="width: 200px"
+              onchange="filterTable()"
+            >
+              <option value="">All Courses</option>
+              <option value="BCA">BCA</option>
+              <option value="B.Sc">B.Sc</option>
+              <option value="B.A">B.A</option>
+              <option value="B.Com">B.Com</option>
+              <option value="BBA">BBA</option>
+              <option value="PGDCA">PGDCA</option>
+              <option value="B.Voc">B.Voc</option>
+            </select>
+            <button
+              class="btn-nav"
+              style="background: #27ae60"
+              onclick="exportToExcel()"
+            >
+              <i class="fa-solid fa-file-excel"></i> Export Excel
+            </button>
+            <button
+              class="btn-nav"
+              style="background: var(--primary)"
+              onclick="fetchUsers()"
+            >
+              Refresh
+            </button>
+          </div>
+        </div>
+
+        <div class="table-responsive">
+          <table id="studentTable">
+            <thead>
+              <tr>
+                <th>Full Name</th>
+                <th>Email ID</th>
+                <th>gender</th>
+                <th>Roll Number</th>
+                <th>Course</th>
+                <th>Attendance</th>
+                <th>Grade</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="userTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <script>
+      const API_BASE = "http://127.0.0.1:5000";
+      let allUsersData = [];
+
+      // 1. Fetch Students
+      async function fetchUsers() {
+        try {
+          const res = await fetch(`${API_BASE}/admin/get_users`);
+          allUsersData = await res.json();
+          renderTable(allUsersData);
+        } catch (err) {
+          console.error("Error fetching users:", err);
+        }
+      }
+
+      // 2. Render Table
+      function renderTable(users) {
+        const tbody = document.getElementById("userTableBody");
+        if (users.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;">No students found.</td></tr>`;
+          return;
+        }
+        tbody.innerHTML = users
+          .map(
+            (user) => `
+          <tr>
+            <td><b>${user.name}</b></td>
+            <td style="color: #64748b">${user.email}</td>
+            <td>${user.gender || "N/A"}</td>
+            <td><span style="background:#f1f5f9; padding:4px 8px; border-radius:5px;">${user.roll || "N/A"}</span></td>
+            <td>${user.course || "N/A"}</td>
+            <td style="color: ${user.attendance >= 75 ? "green" : "red"}; font-weight:800">${user.attendance || "0"}%</td>
+            <td><b style="color: var(--primary)">${user.internal_grade || "N/A"}</b></td>
+            <td>
+                <button class="action-btn" style="background: var(--info)" onclick="updatePrompt('${user.email}')"><i class="fa-solid fa-pen"></i></button>
+                <button class="action-btn" style="background: var(--danger)" onclick="deleteUser('${user.email}')"><i class="fa-solid fa-trash"></i></button>
+            </td>
+          </tr>`,
+          )
+          .join("");
+      }
+
+      // 3. Search & Course Filter Logic
+      function filterTable() {
+        const searchTerm = document
+          .getElementById("searchInput")
+          .value.toLowerCase();
+        const courseTerm = document
+          .getElementById("courseFilter")
+          .value.toLowerCase();
+
+        const filtered = allUsersData.filter((user) => {
+          const matchesSearch =
+            user.name.toLowerCase().includes(searchTerm) ||
+            (user.roll && user.roll.toLowerCase().includes(searchTerm));
+          const matchesCourse =
+            courseTerm === "" ||
+            (user.course && user.course.toLowerCase() === courseTerm);
+          return matchesSearch && matchesCourse;
+        });
+        renderTable(filtered);
+      }
+
+      // 4. Export to Excel
+      function exportToExcel() {
+        if (allUsersData.length === 0)
+          return Swal.fire("Error", "No data to export", "error");
+
+        const searchTerm = document
+          .getElementById("searchInput")
+          .value.toLowerCase();
+        const courseTerm = document
+          .getElementById("courseFilter")
+          .value.toLowerCase();
+
+        const filteredData = allUsersData.filter((user) => {
+          const matchesSearch =
+            user.name.toLowerCase().includes(searchTerm) ||
+            (user.roll && user.roll.toLowerCase().includes(searchTerm));
+          const matchesCourse =
+            courseTerm === "" ||
+            (user.course && user.course.toLowerCase() === courseTerm);
+          return matchesSearch && matchesCourse;
+        });
+
+        const exportRows = filteredData.map((user) => ({
+          "Username/Email": user.email || "N/A",
+          "Full Name": user.name || "N/A",
+          Gender: user.gender || "N/A",
+          "Date of Birth": user.dob || "N/A",
+          Course: user.course || "N/A",
+          "Roll Number": user.roll || "N/A",
+          "Mobile Number": user.phone || "N/A",
+          "Attendance %": user.attendance || "0",
+          "Internal Grade": user.internal_grade || "N/A",
+        }));
+
+        const worksheet = XLSX.utils.json_to_sheet(exportRows);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Student_Registry");
+
+        XLSX.writeFile(workbook, "COE_Student_Registry.xlsx");
+
+        Swal.fire("Success", "Excel file has been generated .", "success");
+      }
+
+      // 5. Update Records (Attendance/Grade)
+      async function updatePrompt(email) {
+        const { value: formValues } = await Swal.fire({
+          title: "Update Student Standing",
+          html: `<input id="swal-att" class="swal2-input" placeholder="Attendance %">
+                 <input id="swal-grd" class="swal2-input" placeholder="Internal Grade">`,
+          showCancelButton: true,
+          confirmButtonColor: "var(--primary)",
+          preConfirm: () => ({
+            attendance: document.getElementById("swal-att").value,
+            grade: document.getElementById("swal-grd").value,
+          }),
+        });
+
+        if (formValues) {
+          try {
+            const res = await fetch(`${API_BASE}/admin/update_attendance`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ email, ...formValues }),
+            });
+            const data = await res.json();
+            if (data.success) {
+              Swal.fire("Updated!", data.message, "success");
+              fetchUsers();
+            }
+          } catch (e) {
+            Swal.fire("Error", "Update failed", "error");
+          }
+        }
+      }
+
+      // 6. Delete User
+      async function deleteUser(email) {
+        const result = await Swal.fire({
+          title: "Delete Student Account?",
+          text: "This action cannot be undone!",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonColor: "var(--danger)",
+        });
+
+        if (result.isConfirmed) {
+          try {
+            const res = await fetch(`${API_BASE}/admin/delete_user`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ email }),
+            });
+            if ((await res.json()).success) {
+              Swal.fire("Deleted!", "User removed successfully.", "success");
+              fetchUsers();
+            }
+          } catch (e) {
+            Swal.fire("Error", "Deletion failed", "error");
+          }
+        }
+      }
+
+      function adminLogout() {
+        sessionStorage.clear();
+        window.location.href = "login.html";
+      }
+
+      window.onload = fetchUsers;
+    </script>
+  </body>
+</html>

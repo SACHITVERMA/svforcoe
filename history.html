@@ -1,0 +1,301 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chat History - COE Assistant</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+    />
+    <style>
+      :root {
+        --primary: #6a11cb;
+        --secondary: #2575fc;
+        --bg: #f0f2f5;
+        --white: #ffffff;
+        --text-main: #2d3436;
+        --text-muted: #636e72;
+      }
+
+      body {
+        background: var(--bg);
+        font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        color: var(--text-main);
+      }
+
+      /* Responsive Container */
+      .history-container {
+        max-width: 1400px;
+        margin: 40px auto;
+        padding: 20px;
+      }
+
+      .header-section {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+        flex-wrap: wrap;
+        gap: 15px;
+      }
+
+      .back-btn {
+        padding: 12px 24px;
+        background: var(--white);
+        color: var(--primary);
+        border: 2px solid var(--primary);
+        border-radius: 8px;
+        cursor: pointer;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .back-btn:hover {
+        background: var(--primary);
+        color: var(--white);
+      }
+
+      h2 {
+        margin: 0;
+        font-size: 2rem;
+        background: linear-gradient(to right, var(--primary), var(--secondary));
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+
+      /* History Cards */
+      .history-card {
+        background: var(--white);
+        border-radius: 20px;
+        padding: 15px;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        border-left: 5px solid var(--primary);
+        transition: transform 0.2s ease;
+      }
+
+      .history-card:hover {
+        transform: scale(1.05);
+      }
+
+      .timestamp {
+        font-size: 12px;
+        color: var(--text-muted);
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+      }
+
+      .chat-row {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+      }
+
+      .message {
+        padding: 20px;
+        border-radius: 12px;
+        line-height: 1.5;
+        font-size: 1rem;
+      }
+
+      .user {
+        background: #f8f9fa;
+        border-right: 3px solid #dfe6e9;
+      }
+
+      .bot {
+        background: #f0f7ff;
+        border-right: 3px solid var(--secondary);
+      }
+
+      strong {
+        color: var(--primary);
+      }
+
+      /* Mobile Responsiveness */
+      @media (max-width: 768px) {
+        .history-container {
+          margin: 15px auto;
+          padding: 10px;
+        }
+        h2 {
+          font-size: 1.5rem;
+          width: 100%;
+          order: 1;
+        }
+        .header-section {
+          justify-content: flex-start;
+        }
+        .back-btn {
+          width: 100%;
+          justify-content: center;
+          order: 2;
+        }
+        .message {
+          font-size: 0.95rem;
+        }
+        .history-card {
+          padding: 15px;
+        }
+      }
+
+      body.dark-theme {
+        background-color: #0f172a; /* Dark background */
+        color: #f1f5f9; /* Light text */
+      }
+
+      body.dark-theme .card,
+      body.dark-theme .stat-card,
+      body.dark-theme .dash-section,
+      body.dark-theme .history-card {
+        background: #1e293b; /* Darker cards */
+        color: #f1f5f9;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      /* Dark Mode colors for History Cards and Text visibility */
+      body.dark-theme {
+        background-color: #0f172a;
+        color: #f1f5f9;
+      }
+
+      body.dark-theme .history-card {
+        background: #1e293b; /* Card background dark */
+        color: #f1f5f9;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      /* Messages visibility fix inside cards */
+      body.dark-theme .user {
+        background: #334155 !important; /* User message box dark grey */
+        color: #f1f5f9 !important;
+        border-right-color: #475569 !important;
+      }
+
+      body.dark-theme .bot {
+        background: #1e293b !important; /* Bot message box slightly different dark */
+        color: #f1f5f9 !important;
+        border-right-color: var(--secondary) !important;
+      }
+
+      body.dark-theme .timestamp {
+        color: #94a3b8; /* Light grey timestamp */
+      }
+
+      body.dark-theme .message {
+        color: #f1f5f9; /*  message text visible */
+      }
+
+      /* Label fix (You/Bot names) */
+      body.dark-theme strong {
+        color: #38bdf8; /* Light blue color for names in dark mode */
+      }
+
+      /* Background tags visibility fix */
+      body.dark-theme span {
+        background: rgba(255, 255, 255, 0.1) !important;
+        color: #f1f5f9 !important;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="history-container">
+      <div class="header-section">
+        <h2><i class="fa-solid fa-clock-rotate-left"></i> Chat History</h2>
+        <a href="index.html" class="back-btn"
+          ><i class="fa-solid fa-arrow-left"></i> Back to Chat</a
+        >
+      </div>
+
+      <div id="historyList">
+        <div style="text-align: center; padding: 50px">
+          <i
+            class="fa-solid fa-spinner fa-spin fa-2x"
+            style="color: var(--primary)"
+          ></i>
+          <p>Retrieving your conversations...</p>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      async function fetchHistory() {
+        const userEmail = sessionStorage.getItem("user_id");
+        console.log("History Fetch for:", userEmail);
+
+        if (!userEmail) {
+          window.location.href = "login.html";
+          return;
+        }
+
+        try {
+          const response = await fetch("http://127.0.0.1:5000/history", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email: userEmail }),
+          });
+
+          const data = await response.json();
+          const list = document.getElementById("historyList");
+          list.innerHTML = "";
+
+          if (!data || data.length === 0) {
+            list.innerHTML = `
+                <div style="text-align:center; margin-top:50px; color:var(--text-muted);">
+                    <i class="fa-solid fa-comment-slash fa-3x"></i>
+                    <p style="margin-top:15px;">No conversations found for your account.</p>
+                </div>`;
+            return;
+          }
+
+          data.forEach((chat) => {
+            const card = document.createElement("div");
+            card.className = "history-card";
+            card.innerHTML = `
+                <div class="timestamp"><i class="fa-regular fa-calendar-check"></i> ${chat.time}</div>
+                <div class="chat-row">
+                    <div class="message user">
+                        <strong><i class="fa-solid fa-user"></i> You:</strong><br>${chat.user}
+                    </div>
+                    <div class="message bot">
+                        <strong><i class="fa-solid fa-robot"></i> Bot:</strong><br>${chat.bot}
+                    </div>
+                </div>
+            `;
+            list.appendChild(card);
+          });
+        } catch (error) {
+          console.error("Fetch Error:", error);
+          document.getElementById("historyList").innerHTML = `
+            <div style="text-align:center; color:red; padding:50px;">
+                <i class="fa-solid fa-triangle-exclamation fa-2x"></i>
+                <p>Failed to connect to the server. Please ensure app.py is running.</p>
+            </div>`;
+        }
+      }
+
+      function applyTheme() {
+        const savedTheme = localStorage.getItem("theme");
+        if (savedTheme === "dark") {
+          document.body.classList.add("dark-theme");
+        } else {
+          document.body.classList.remove("dark-theme");
+        }
+      }
+
+      applyTheme();
+
+      window.onload = fetchHistory;
+    </script>
+  </body>
+</html>

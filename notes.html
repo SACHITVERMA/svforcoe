@@ -1,0 +1,554 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Notes Hub | COE Assistant</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+      :root {
+        --primary: #6a11cb;
+        --secondary: #2575fc;
+        --bg: #f8fafc;
+        --white: #ffffff;
+        --text: #1e293b;
+        --student-accent: #2ecc71;
+      }
+
+      body.dark-theme {
+        --bg: #0f172a;
+        --white: #1e293b;
+        --text: #f1f5f9;
+      }
+
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: "Segoe UI", sans-serif;
+        margin: 0;
+        padding: 20px;
+        transition: 0.3s;
+      }
+      .container {
+        max-width: 1100px;
+        margin: auto;
+      }
+
+      /* Header & Navigation */
+      .nav-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+      }
+      .back-btn {
+        text-decoration: none;
+        color: var(--primary);
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      /* Modern Toggle Switch */
+      .toggle-container {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 30px;
+      }
+      .toggle-wrapper {
+        background: #e2e8f0;
+        padding: 5px;
+        border-radius: 16px;
+        display: flex;
+        gap: 5px;
+        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      .tgl-btn {
+        border: none;
+        padding: 12px 30px;
+        border-radius: 12px;
+        cursor: pointer;
+        font-weight: 700;
+        transition: 0.3s;
+        background: transparent;
+        color: #64748b;
+        font-size: 14px;
+      }
+      .tgl-btn.active {
+        background: var(--white);
+        color: var(--primary);
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      }
+
+      /* Search & Action Bar */
+      .action-bar {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 30px;
+        flex-wrap: wrap;
+      }
+      .search-box {
+        flex: 1;
+        padding: 14px 20px;
+        border-radius: 14px;
+        border: 1.5px solid #ddd;
+        outline: none;
+        font-size: 15px;
+        background: var(--white);
+      }
+      .upload-trigger {
+        background: var(--primary);
+        color: white;
+        border: none;
+        padding: 14px 25px;
+        border-radius: 14px;
+        font-weight: bold;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      /* Notes Grid */
+      .notes-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 20px;
+      }
+      .note-card {
+        background: var(--white);
+        padding: 25px;
+        border-radius: 20px;
+        border: 1px solid #eee;
+        position: relative;
+        transition: 0.3s;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.02);
+      }
+      .note-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 25px rgba(0, 0, 0, 0.08);
+      }
+      .badge {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        font-size: 10px;
+        padding: 5px 10px;
+        border-radius: 6px;
+        font-weight: 800;
+        text-transform: uppercase;
+      }
+      .admin-badge {
+        background: #e0e7ff;
+        color: #4338ca;
+      }
+      .student-badge {
+        background: #dcfce7;
+        color: #166534;
+      }
+
+      /* Card Content */
+      .file-icon {
+        font-size: 45px;
+        color: var(--primary);
+        margin-bottom: 15px;
+      }
+      .download-btn {
+        display: block;
+        text-align: center;
+        background: #f1f5f9;
+        color: var(--primary);
+        padding: 12px;
+        border-radius: 12px;
+        text-decoration: none;
+        font-weight: 700;
+        margin-top: 20px;
+        transition: 0.2s;
+      }
+      .download-btn:hover {
+        background: var(--primary);
+        color: white;
+      }
+
+      /* Modal */
+      .modal {
+        display: none;
+        position: fixed;
+        z-index: 2000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(4px);
+      }
+      .modal-content {
+        background: white;
+        max-width: 450px;
+        margin: 60px auto;
+        padding: 30px;
+        border-radius: 25px;
+        position: relative;
+      }
+      .form-group {
+        margin-bottom: 15px;
+      }
+      .form-group label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+        font-size: 14px;
+      }
+      .form-group input,
+      .form-group select {
+        width: 100%;
+        padding: 12px;
+        border-radius: 10px;
+        border: 1px solid #ddd;
+        box-sizing: border-box;
+      }
+
+      .note-card,
+      .search-box,
+      .modal-content {
+        background: var(--white) !important;
+        color: var(--text) !important;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .note-card h3 {
+        color: var(--text);
+      }
+
+      .nav-header h2 {
+        color: var(--text);
+      }
+
+      /* --- MOBILE RESPONSIVE MEDIA QUERIES --- */
+
+      @media (max-width: 768px) {
+        body {
+          padding: 10px;
+        }
+
+        .nav-header {
+          flex-direction: column;
+          gap: 15px;
+          text-align: center;
+          padding: 15px 10px;
+        }
+
+        .nav-header h2 {
+          font-size: 1.5rem;
+        }
+
+        .search-box {
+          flex-direction: column;
+          gap: 10px;
+          padding: 15px;
+        }
+
+        .search-box input,
+        .search-box select {
+          width: 100%;
+        }
+
+        .notes-grid {
+          grid-template-columns: 1fr;
+          gap: 15px;
+        }
+
+        .note-card {
+          padding: 15px;
+        }
+
+        .add-note-btn {
+          width: 50px;
+          height: 50px;
+          bottom: 20px;
+          right: 20px;
+          font-size: 20px;
+        }
+
+        /* Modal (Popup) responsiveness */
+        .modal-content {
+          width: 95%;
+          margin: 10% auto;
+          padding: 20px;
+        }
+
+        .form-group input,
+        .form-group textarea {
+          font-size: 16px;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .note-card h3 {
+          font-size: 1.1rem;
+        }
+
+        .badge {
+          font-size: 0.7rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="nav-header">
+        <a href="index.html" class="back-btn"
+          ><i class="fa-solid fa-arrow-left"></i> Back to Chat</a
+        >
+        <h2
+          style="
+            margin: 0;
+            background: linear-gradient(to right, #070707, #2575fc);
+            /* -webkit-background-clip: text;
+            background-clip: var(--text);
+            -webkit-text-fill-color: transparent; */
+            color: #f1f2f4;
+          "
+        >
+          COE Notes Hub
+        </h2>
+      </div>
+
+      <div class="toggle-container">
+        <div class="toggle-wrapper">
+          <button
+            class="tgl-btn active"
+            id="btnFaculty"
+            onclick="switchTab('faculty')"
+          >
+            Official Notes
+          </button>
+          <button
+            class="tgl-btn"
+            id="btnStudent"
+            onclick="switchTab('student')"
+          >
+            Community Posts
+          </button>
+        </div>
+      </div>
+
+      <div class="action-bar">
+        <input
+          type="text"
+          class="search-box"
+          id="noteSearch"
+          placeholder="Search subject or topic..."
+          onkeyup="filterNotes()"
+        />
+        <button class="upload-trigger" onclick="openModal()">
+          <i class="fa-solid fa-cloud-arrow-up"></i> Upload PDF
+        </button>
+      </div>
+
+      <div id="facultyWrapper" class="notes-grid"></div>
+
+      <div id="studentWrapper" class="notes-grid" style="display: none"></div>
+    </div>
+
+    <div id="uploadModal" class="modal">
+      <div class="modal-content">
+        <h3 style="margin-top: 0">
+          <i class="fa-solid fa-file-circle-plus"></i> Share Study Material
+        </h3>
+        <form id="noteUploadForm">
+          <div class="form-group">
+            <label>Title / Topic Name</label>
+            <input
+              type="text"
+              id="noteTitle"
+              placeholder="e.g. Computer Graphics Unit 1 Basics"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label>Subject</label>
+            <input
+              type="text"
+              id="noteSubject"
+              placeholder="e.g. Computer Graphics"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label>Upload PDF</label>
+            <input type="file" id="noteFile" accept=".pdf" required />
+          </div>
+          <button
+            type="submit"
+            class="upload-trigger"
+            style="width: 100%; justify-content: center"
+          >
+            Post to Hub
+          </button>
+          <button
+            type="button"
+            onclick="closeModal()"
+            style="
+              width: 100%;
+              margin-top: 10px;
+              background: #eee;
+              border: none;
+              padding: 12px;
+              border-radius: 12px;
+              cursor: pointer;
+              font-weight: bold;
+            "
+          >
+            Cancel
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <script>
+      const API_BASE = "http://127.0.0.1:5000";
+
+      function switchTab(view) {
+        const fw = document.getElementById("facultyWrapper");
+        const sw = document.getElementById("studentWrapper");
+        const btnF = document.getElementById("btnFaculty");
+        const btnS = document.getElementById("btnStudent");
+
+        if (view === "faculty") {
+          fw.style.display = "grid";
+          sw.style.display = "none";
+          btnF.classList.add("active");
+          btnS.classList.remove("active");
+        } else {
+          fw.style.display = "none";
+          sw.style.display = "grid";
+          btnS.classList.add("active");
+          btnF.classList.remove("active");
+        }
+      }
+
+      function openModal() {
+        document.getElementById("uploadModal").style.display = "block";
+      }
+      function closeModal() {
+        document.getElementById("uploadModal").style.display = "none";
+      }
+
+      async function fetchNotes() {
+        const userEmail = sessionStorage.getItem("user_id");
+        console.log("Fetch Notes for:", userEmail);
+
+        if (!userEmail) {
+          window.location.href = "login.html";
+          return;
+        }
+        try {
+          const res = await fetch(`${API_BASE}/get_notes`);
+          const notes = await res.json();
+          const fw = document.getElementById("facultyWrapper");
+          const sw = document.getElementById("studentWrapper");
+
+          fw.innerHTML = "";
+          sw.innerHTML = "";
+
+          notes.forEach((note) => {
+            const isAdmin = note.uploaded_by.includes("Admin");
+            const card = `
+                    <div class="note-card ${isAdmin ? "" : "student-border"}">
+                        <span class="badge ${isAdmin ? "admin-badge" : "student-badge"}">${isAdmin ? "Faculty" : "Student"}</span>
+                        <div class="file-icon"><i class="fa-solid ${isAdmin ? "fa-file-pdf" : "fa-file-lines"}"></i></div>
+                        <h3 style="margin: 0;">${note.title}</h3>
+                        <p style="color: #666; font-size: 13px;">Subject: ${note.subject} | By: ${note.uploaded_by}</p>
+                        <a href="${API_BASE}/static/uploads/notes/${note.file_path}" target="_blank" class="download-btn">
+                            <i class="fa-solid fa-download"></i> Download
+                        </a>
+                    </div>`;
+
+            if (isAdmin) fw.innerHTML += card;
+            else sw.innerHTML += card;
+          });
+        } catch (e) {
+          console.error("Error loading notes");
+        }
+      }
+
+      document.getElementById("noteUploadForm").onsubmit = async (e) => {
+        e.preventDefault();
+        const userEmail = sessionStorage.getItem("user_id");
+        if (!userEmail) return Swal.fire("Error", "Login required", "error");
+
+        const formData = new FormData();
+        formData.append("email", userEmail);
+        formData.append("title", document.getElementById("noteTitle").value);
+        formData.append(
+          "subject",
+          document.getElementById("noteSubject").value,
+        );
+        formData.append("file", document.getElementById("noteFile").files[0]);
+
+        Swal.fire({ title: "Posting...", didOpen: () => Swal.showLoading() });
+
+        try {
+          const res = await fetch(`${API_BASE}/admin/upload_notes`, {
+            method: "POST",
+            body: formData,
+          });
+          if ((await res.json()).success) {
+            Swal.fire("Success", "Notes shared with Community!", "success");
+            closeModal();
+            fetchNotes();
+          }
+        } catch (err) {
+          Swal.fire("Error", "Server Error", "error");
+        }
+      };
+
+      function filterNotes() {
+        const term = document.getElementById("noteSearch").value.toLowerCase();
+        const cards = document.querySelectorAll(".note-card");
+
+        cards.forEach((card) => {
+          const title = card.querySelector("h3").innerText.toLowerCase();
+          const subjectAndMore = card
+            .querySelector("p")
+            .innerText.toLowerCase();
+
+          if (title.includes(term) || subjectAndMore.includes(term)) {
+            card.style.display = "";
+          } else {
+            card.style.display = "none";
+          }
+        });
+      }
+
+      function applySavedTheme() {
+        const savedTheme = localStorage.getItem("theme");
+        if (savedTheme === "dark") {
+          document.body.classList.add("dark-theme");
+        } else {
+          document.body.classList.remove("dark-theme");
+        }
+      }
+
+      applySavedTheme();
+
+      window.addEventListener("storage", (e) => {
+        if (e.key === "theme") {
+          applySavedTheme();
+        }
+      });
+
+      window.addEventListener("DOMContentLoaded", () => {
+        fetchNotes();
+      });
+
+      window.onload = fetchNotes;
+    </script>
+  </body>
+</html>

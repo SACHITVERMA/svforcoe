@@ -1,0 +1,337 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Verified Students Registry | Admin</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+      :root {
+        --primary: #6a11cb;
+        --success: #2ecc71;
+      }
+      body {
+        font-family: "Segoe UI", sans-serif;
+        background: #f4f7f6;
+        margin: 0;
+        padding: 20px;
+      }
+      .container {
+        max-width: 1300px;
+        margin: auto;
+      }
+
+      /* Search & Filter Bar */
+      .controls {
+        background: white;
+        padding: 20px;
+        border-radius: 12px;
+        display: flex;
+        gap: 15px;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+      }
+      .search-input {
+        flex: 1;
+        padding: 12px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+      }
+      .filter-select {
+        padding: 12px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        width: 150px;
+      }
+
+      /* Table Styling */
+      .table-wrapper {
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      thead {
+        background: var(--primary);
+        color: white;
+      }
+      th,
+      td {
+        padding: 15px;
+        text-align: left;
+        border-bottom: 1px solid #eee;
+      }
+      tr:hover {
+        background: #f9f9f9;
+      }
+
+      .student-thumb {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        object-fit: cover;
+      }
+      .id-badge {
+        background: #e8f5e9;
+        color: #2e7d32;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-weight: bold;
+        font-size: 12px;
+      }
+
+      .pagination {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 20px;
+      }
+      .page-btn {
+        padding: 8px 16px;
+        border: 1px solid var(--primary);
+        background: white;
+        cursor: pointer;
+        border-radius: 5px;
+      }
+      .page-btn.active {
+        background: var(--primary);
+        color: white;
+      }
+
+      /* --- MOBILE RESPONSIVE MEDIA QUERY --- */
+      @media (max-width: 768px) {
+        body {
+          padding: 10px;
+        }
+
+        .header {
+          flex-direction: column;
+          text-align: center;
+          gap: 10px;
+          margin-bottom: 20px;
+        }
+
+        .controls {
+          flex-direction: column;
+          padding: 15px;
+          gap: 10px;
+        }
+
+        .search-input,
+        .filter-select,
+        .controls button {
+          width: 100%;
+          margin: 0;
+          box-sizing: border-box;
+        }
+
+        .table-wrapper {
+          overflow-x: auto;
+          -webkit-overflow-scrolling: touch;
+          border-radius: 8px;
+        }
+
+        table {
+          min-width: 700px;
+        }
+
+        th,
+        td {
+          padding: 12px 10px;
+          font-size: 13px;
+        }
+
+        .student-thumb {
+          width: 35px;
+          height: 35px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div
+        class="header"
+        style="
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        "
+      >
+        <h2>
+          <i class="fa-solid fa-users-check"></i> Verified Students Registry
+        </h2>
+        <a
+          href="student_verification.html"
+          style="
+            text-decoration: none;
+            color: var(--primary);
+            font-weight: bold;
+          "
+          ><i class="fa-solid fa-arrow-left"></i> Back to Verification</a
+        >
+      </div>
+
+      <div class="controls">
+        <input
+          type="text"
+          id="searchInput"
+          class="search-input"
+          placeholder="Search by Name or Roll Number..."
+          onkeyup="filterData()"
+        />
+        <select id="courseFilter" class="filter-select" onchange="filterData()">
+          <option value="">All Courses</option>
+          <option value="BCA">BCA</option>
+          <option value="B.Sc">B.Sc</option>
+          <option value="B.A">B.A</option>
+          <option value="B.Com">B.Com</option>
+          <option value="BBA">BBA</option>
+          <option value="B.VOC">B.VOC</option>
+          <option value="PGDCA">PGDCA</option>
+        </select>
+        <input
+          type="text"
+          id="sessionInput"
+          class="filter-select"
+          style="width: 180px"
+          placeholder="Enter Session (e.g. 2022-25)"
+          onkeyup="filterData()"
+        />
+        <button
+          onclick="exportData()"
+          style="
+            padding: 12px 20px;
+            background: #27ae60;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+          "
+        >
+          <i class="fa-solid fa-file-excel"></i> Export
+        </button>
+      </div>
+
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Photo</th>
+              <th>Full Name</th>
+              <th>Roll No</th>
+              <th>Course</th>
+              <th>Session</th>
+              <th>Unique ID</th>
+              <th>Phone</th>
+              <th>Documents</th>
+            </tr>
+          </thead>
+          <tbody id="verifiedTableBody"></tbody>
+        </table>
+      </div>
+
+      <div class="pagination" id="pagination"></div>
+    </div>
+
+    <script>
+      const API_BASE = "http://127.0.0.1:5000";
+      let allStudents = [];
+
+      async function loadData() {
+        try {
+          const res = await fetch(`${API_BASE}/admin/get_verified_students`);
+          allStudents = await res.json();
+          renderTable(allStudents);
+        } catch (e) {
+          console.error("Error loading registry");
+        }
+      }
+      function renderTable(data) {
+        const tbody = document.getElementById("verifiedTableBody");
+        tbody.innerHTML = data
+          .map(
+            (s) => `
+        <tr>
+            <td><img src="${API_BASE}/static/uploads/id_docs/${s.photo_path}" class="student-thumb"></td>
+            <td><b>${s.full_name}</b></td>
+            <td>${s.roll_no}</td>
+            <td>${s.department}</td>
+            <td><span class="id-badge" style="background:#e3f2fd; color:#1565c0;">${s.academic_year || "N/A"}</span></td>
+            <td><span class="id-badge">${s.unique_id || "N/A"}</span></td>
+            <td>${s.phone || "N/A"}</td>
+            <td><a href="${API_BASE}/static/uploads/id_docs/${s.marksheet_path}" target="_blank" style="color:var(--primary);"><i class="fa-solid fa-eye"></i> View Doc</a></td>
+        </tr>
+    `,
+          )
+          .join("");
+      }
+
+      function filterData() {
+        const searchTerm = document
+          .getElementById("searchInput")
+          .value.toLowerCase();
+        const courseTerm = document.getElementById("courseFilter").value;
+        const sessionTerm = document
+          .getElementById("sessionInput")
+          .value.toLowerCase(); // Manual input value
+
+        const filtered = allStudents.filter((s) => {
+          const matchesSearch =
+            s.full_name.toLowerCase().includes(searchTerm) ||
+            s.roll_no.toLowerCase().includes(searchTerm);
+          const matchesCourse =
+            courseTerm === "" || s.department === courseTerm;
+
+          // Session filter jo manual typing check karega
+          const studentSession = (s.academic_year || "").toLowerCase();
+          const matchesSession =
+            sessionTerm === "" || studentSession.includes(sessionTerm);
+
+          return matchesSearch && matchesCourse && matchesSession;
+        });
+        renderTable(filtered);
+      }
+
+      function exportData() {
+        const table = document.querySelector("table");
+        const rows = Array.from(table.rows);
+
+        let csvContent = "data:text/csv;charset=utf-8,";
+
+        rows.forEach((row) => {
+          const cells = Array.from(row.cells);
+
+          const filteredData = cells
+            .slice(1, -1)
+            .map((cell) => {
+              let text = cell.innerText.replace(/(\r\n|\n|\r)/gm, "").trim();
+              return `"${text}"`;
+            })
+            .join(",");
+
+          csvContent += filteredData + "\r\n";
+        });
+
+        // File download logic
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", "Verified_Students_Data.csv");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
+
+      window.onload = loadData;
+    </script>
+  </body>
+</html>

@@ -1,0 +1,406 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Advanced Notes Management | COE Admin</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+      :root {
+        --primary: #4f46e5;
+        --secondary: #0ea5e9;
+        --danger: #dc2626;
+        --success: #16a34a;
+        --text-dark: #0f172a;
+        --text-muted: #475569;
+        --glass-bg: rgba(255, 255, 255, 0.98);
+      }
+
+      body {
+        background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
+        font-family: "Plus Jakarta Sans", "Segoe UI", sans-serif;
+        margin: 0;
+        padding: 30px;
+        min-height: 100vh;
+        color: var(--text-dark);
+      }
+
+      .container {
+        max-width: 1250px;
+        margin: auto;
+      }
+
+      /* Top Navigation Bar */
+      .glass-nav {
+        background: var(--glass-bg);
+        padding: 20px 35px;
+        border-radius: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        margin-bottom: 30px;
+        border: 1px solid rgba(255, 255, 255, 0.5);
+      }
+
+      .back-btn {
+        text-decoration: none;
+        color: var(--primary);
+        font-weight: 800;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: #f1f5f9;
+        padding: 12px 24px;
+        border-radius: 14px;
+        transition: 0.3s;
+      }
+
+      .back-btn:hover {
+        background: var(--primary);
+        color: white;
+      }
+
+      /* Section Cards */
+      .admin-card {
+        background: #ffffff;
+        padding: 40px;
+        border-radius: 25px;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.05);
+        margin-bottom: 30px;
+        border: 1px solid rgba(0, 0, 0, 0.05);
+      }
+
+      .section-title {
+        font-size: 1.6rem;
+        font-weight: 800;
+        margin-bottom: 30px;
+        color: var(--text-dark);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      /* Upload Form Grid */
+      .upload-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr auto;
+        gap: 20px;
+        align-items: end;
+      }
+
+      .input-group {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .input-group label {
+        font-weight: 800;
+        color: var(--text-muted);
+        font-size: 0.85rem;
+        text-transform: uppercase;
+      }
+
+      input,
+      select {
+        padding: 14px;
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        font-size: 15px;
+        color: var(--text-dark);
+        font-weight: 600;
+        outline: none;
+        transition: 0.3s;
+      }
+
+      input:focus {
+        border-color: var(--primary);
+      }
+
+      .btn-upload {
+        background: var(--primary);
+        color: white;
+        border: none;
+        padding: 15px 30px;
+        border-radius: 14px;
+        font-weight: 800;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        transition: 0.3s;
+      }
+
+      .btn-upload:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(79, 70, 229, 0.3);
+      }
+
+      /* Enhanced Table Visibility */
+      .table-container {
+        overflow-x: auto;
+      }
+      table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0 12px;
+      }
+
+      th {
+        text-align: left;
+        padding: 15px 20px;
+        color: #1e293b;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        font-weight: 800;
+        letter-spacing: 0.5px;
+      }
+
+      td {
+        padding: 22px 20px;
+        background: #ffffff;
+        border-top: 1px solid #f1f5f9;
+        border-bottom: 1px solid #f1f5f9;
+        color: var(--text-dark);
+        font-weight: 600;
+        font-size: 15px;
+      }
+
+      tr td:first-child {
+        border-left: 1px solid #f1f5f9;
+        border-top-left-radius: 18px;
+        border-bottom-left-radius: 18px;
+      }
+      tr td:last-child {
+        border-right: 1px solid #f1f5f9;
+        border-top-right-radius: 18px;
+        border-bottom-right-radius: 18px;
+      }
+
+      .badge {
+        padding: 6px 14px;
+        border-radius: 8px;
+        font-size: 11px;
+        font-weight: 900;
+        text-transform: uppercase;
+      }
+      .badge-faculty {
+        background: #e0e7ff;
+        color: #4338ca;
+      }
+      .badge-student {
+        background: #dcfce7;
+        color: #166534;
+      }
+
+      /* Action Buttons */
+      .action-btn {
+        padding: 10px 16px;
+        border-radius: 10px;
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 800;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: 0.2s;
+        border: none;
+        cursor: pointer;
+      }
+
+      .btn-read {
+        background: #ecfdf5;
+        color: #059669;
+        margin-right: 10px;
+      }
+      .btn-read:hover {
+        background: #059669;
+        color: white;
+      }
+
+      .btn-delete {
+        background: #fef2f2;
+        color: #dc2626;
+      }
+      .btn-delete:hover {
+        background: #dc2626;
+        color: white;
+      }
+
+      @media (max-width: 900px) {
+        .upload-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="glass-nav">
+        <h2 style="margin: 0; font-weight: 800; color: var(--text-dark)">
+          <i class="fa-solid fa-book-bookmark"></i> Study Material Registry
+        </h2>
+        <a href="admin.html" class="back-btn"
+          ><i class="fa-solid fa-arrow-left"></i> Back to Dashboard</a
+        >
+      </div>
+
+      <div class="admin-card">
+        <div class="section-title">
+          <i class="fa-solid fa-file-circle-plus"></i> Upload Official Notes
+        </div>
+        <form id="adminUploadForm" class="upload-grid">
+          <div class="input-group">
+            <label>Note Title / Topic</label>
+            <input
+              type="text"
+              id="title"
+              placeholder="e.g. Computer Graphics Unit 2"
+              required
+            />
+          </div>
+          <div class="input-group">
+            <label>Subject</label>
+
+            <input
+              type="text"
+              id="subject"
+              placeholder="e.g. Computer Graphics"
+              required
+            />
+          </div>
+          <div class="input-group">
+            <label>PDF Document</label>
+            <input type="file" id="noteFile" accept=".pdf" required />
+          </div>
+          <button type="submit" class="btn-upload">
+            <i class="fa-solid fa-upload"></i> Publish Now
+          </button>
+        </form>
+      </div>
+
+      <div class="admin-card">
+        <div class="section-title">
+          <i class="fa-solid fa-database"></i> Live Database Content
+        </div>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Document Title</th>
+                <th>Subject</th>
+                <th>Type</th>
+                <th>Upload Date</th>
+                <th style="text-align: center">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="adminNotesList"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const API_BASE = "http://127.0.0.1:5000";
+
+      async function fetchNotes() {
+        try {
+          const res = await fetch(`${API_BASE}/get_notes`);
+          const notes = await res.json();
+          const tbody = document.getElementById("adminNotesList");
+
+          tbody.innerHTML = notes
+            .map((n) => {
+              const isFaculty =
+                n.uploaded_by.includes("Admin") ||
+                n.uploaded_by.includes("Faculty");
+              return `
+                <tr>
+                    <td><strong style="color: #0f172a; font-size: 16px;">${n.title}</strong></td>
+                    <td><span style="color: #475569">${n.subject}</span></td>
+                    <td><span class="badge ${isFaculty ? "badge-faculty" : "badge-student"}">${isFaculty ? "FACULTY" : "STUDENT"}</span></td>
+                    <td style="color: #64748b">${n.created_at || "Just Now"}</td>
+                    <td style="text-align: center; min-width: 220px;">
+                        <a href="${API_BASE}/static/uploads/notes/${n.file_path}" target="_blank" class="action-btn btn-read">
+                            <i class="fa-solid fa-eye"></i> Read File
+                        </a>
+                        <button class="action-btn btn-delete" onclick="deleteNote(${n.id})">
+                            <i class="fa-solid fa-trash-can"></i> Delete
+                        </button>
+                    </td>
+                </tr>`;
+            })
+            .join("");
+        } catch (err) {
+          console.error("Fetch Error:", err);
+        }
+      }
+
+      document.getElementById("adminUploadForm").onsubmit = async (e) => {
+        e.preventDefault();
+        const formData = new FormData();
+        formData.append("email", "Faculty (Admin)");
+        formData.append("title", document.getElementById("title").value);
+        formData.append("subject", document.getElementById("subject").value);
+        formData.append("file", document.getElementById("noteFile").files[0]);
+
+        Swal.fire({
+          title: "Publishing Note...",
+          didOpen: () => Swal.showLoading(),
+        });
+
+        try {
+          const res = await fetch(`${API_BASE}/admin/upload_notes`, {
+            method: "POST",
+            body: formData,
+          });
+          const result = await res.json();
+          if (result.success) {
+            Swal.fire(
+              "Published!",
+              "Notes are now visible to students.",
+              "success",
+            );
+            fetchNotes();
+            e.target.reset();
+          }
+        } catch (err) {
+          Swal.fire("Error", "Server Communication Error", "error");
+        }
+      };
+
+      async function deleteNote(id) {
+        const result = await Swal.fire({
+          title: "Confirm Deletion?",
+          text: "This file will be permanently removed from the server!",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonColor: "#dc2626",
+          confirmButtonText: "Yes, Delete Permanent",
+        });
+
+        if (result.isConfirmed) {
+          try {
+            const res = await fetch(`${API_BASE}/admin/delete_note`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ id }),
+            });
+            if ((await res.json()).success) {
+              Swal.fire("Deleted!", "Document removed.", "success");
+              fetchNotes();
+            }
+          } catch (err) {
+            Swal.fire("Error", "Deletion failed", "error");
+          }
+        }
+      }
+
+      window.onload = fetchNotes;
+    </script>
+  </body>
+</html>

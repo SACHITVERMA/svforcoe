@@ -1,0 +1,477 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>COE Community</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/emoji-mart@latest/dist/browser.js"></script>
+    <style>
+      body {
+        margin: 0;
+        font-family: "Inter", sans-serif;
+        background: #f4f6f8;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+      /* Enhanced Header Styling */
+      .chat-header {
+        padding: 12px 25px;
+        background: rgba(255, 255, 255, 0.9); /* */
+        backdrop-filter: blur(15px); /* */
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); /* */
+        z-index: 100;
+      }
+
+      .header-left {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+      }
+
+      .back-link {
+        color: #1e293b;
+        font-size: 18px;
+        transition: transform 0.2s ease;
+      }
+
+      .back-link:hover {
+        transform: translateX(-3px);
+        color: #6a11cb; /* */
+      }
+
+      /* Group Icon with Gradient */
+      .group-avatar {
+        width: 45px;
+        height: 45px;
+        background: linear-gradient(135deg, #6a11cb, #2575fc); /* */
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 20px;
+        box-shadow: 0 4px 8px rgba(106, 17, 203, 0.2);
+      }
+
+      .header-info h3 {
+        margin: 0;
+        font-size: 16px;
+        font-weight: 700;
+        color: #0b1220; /* */
+      }
+
+      /* Live Pulse Indicator */
+      .status-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-top: 2px;
+      }
+
+      .pulse-dot {
+        width: 8px;
+        height: 8px;
+        background-color: #10b981;
+        border-radius: 50%;
+        position: relative;
+      }
+
+      .pulse-dot::after {
+        content: "";
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background-color: #10b981;
+        border-radius: 50%;
+        animation: pulse-ring 1.5s cubic-bezier(0.455, 0.03, 0.515, 0.955)
+          infinite;
+      }
+
+      @keyframes pulse-ring {
+        0% {
+          transform: scale(0.8);
+          opacity: 0.5;
+        }
+        100% {
+          transform: scale(2.4);
+          opacity: 0;
+        }
+      }
+
+      .status-text {
+        font-size: 11px;
+        font-weight: 500;
+        color: #64748b;
+      }
+
+      .action-icon {
+        color: #64748b;
+        font-size: 18px;
+        margin-left: 20px;
+        cursor: pointer;
+        transition: color 0.2s;
+      }
+
+      .action-icon:hover {
+        color: #6a11cb;
+      }
+
+      #chatBox {
+        flex: 1;
+        padding: 20px;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+      }
+
+      .msg-row {
+        display: flex;
+        width: 100%;
+        flex-direction: column;
+      }
+      .msg-row.out {
+        align-items: flex-end;
+      }
+      .msg-row.in {
+        align-items: flex-start;
+      }
+
+      .bubble {
+        padding: 12px 16px;
+        border-radius: 20px;
+        max-width: 75%;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        position: relative;
+      }
+
+      /* Outgoing: Teal-Purple Gradient */
+      .bubble.out {
+        background: linear-gradient(90deg, #7bf1d9, #b490ca);
+        color: #0b1220;
+        border-top-right-radius: 0;
+      }
+
+      /* Incoming: White with border */
+      .bubble.in {
+        background: white;
+        color: #0b1220;
+        border-left: 4px solid #5ee7df;
+        border-top-left-radius: 0;
+      }
+
+      /* User Name Label */
+      .sender-info {
+        font-size: 11px;
+        font-weight: 800;
+        color: #6a11cb;
+        margin-bottom: 4px;
+        display: block;
+        /* text-transform: capitalize; */
+        text-transform: none !important;
+      }
+
+      /* Complete Image Box */
+      .chat-img {
+        width: 200px;
+        height: auto;
+        max-height: 250px;
+        border-radius: 10px;
+        margin-top: 8px;
+        object-fit: contain;
+        cursor: pointer;
+        background: #f9f9f9;
+        border: 1px solid #eee;
+        display: block;
+      }
+
+      .bubble-footer {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        gap: 10px;
+        margin-top: 6px;
+        font-size: 10px;
+        opacity: 0.5;
+      }
+
+      .delete-ico {
+        color: #ff4d4d;
+        cursor: pointer;
+      }
+
+      .chat-input {
+        padding: 15px;
+        background: white;
+        border-top: 1px solid #eee;
+        display: flex;
+        justify-content: center;
+      }
+
+      .input-pill {
+        display: flex;
+        background: #f0f2f5;
+        border-radius: 25px;
+        padding: 5px 15px;
+        width: 90%;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .input-pill input {
+        flex: 1;
+        background: transparent;
+        border: none;
+        padding: 10px;
+        outline: none;
+      }
+
+      .action-btn {
+        color: #65676b;
+        cursor: pointer;
+        font-size: 18px;
+      }
+      .send-btn {
+        color: #2575fc;
+        cursor: pointer;
+        font-size: 20px;
+        border: none;
+        background: none;
+      }
+
+      #emoji-picker {
+        position: absolute;
+        bottom: 80px;
+        left: 5%;
+        display: none;
+        z-index: 1000;
+      }
+
+      /* --- Mobile Responsiveness --- */
+      @media (max-width: 768px) {
+        #chatBox {
+          padding: 15px 10px;
+        }
+        .bubble {
+          max-width: 85%;
+          font-size: 13.5px;
+        }
+        .chat-img-box {
+          width: 180px;
+        }
+        .input-bar {
+          padding: 10px;
+        }
+        .header-info h3 {
+          font-size: 14px;
+        }
+      }
+
+      /* --- Dark Theme Support (Based on Body Class) --- */
+      body.dark-theme {
+        background-color: #0f172a !important; /* */
+        color: #f8fafc !important;
+      }
+
+      body.dark-theme .chat-header,
+      body.dark-theme .input-bar {
+        background: #1e293b !important; /* */
+        border-color: #334155;
+      }
+
+      body.dark-theme .header-info h3,
+      body.dark-theme .back-link {
+        color: #ffffff !important;
+      }
+
+      body.dark-theme #chatBox {
+        background-color: #0f172a;
+      }
+
+      body.dark-theme .bubble.in {
+        background-color: #1e293b !important;
+        color: #f1f5f9 !important;
+        border-color: #334155;
+      }
+
+      body.dark-theme .input-pill {
+        background-color: #334155 !important;
+      }
+
+      body.dark-theme .input-pill input {
+        color: white;
+      }
+    </style>
+  </head>
+  <body>
+    <header class="chat-header">
+      <div class="header-left">
+        <a href="index.html" class="back-link"
+          ><i class="fa-solid fa-chevron-left"></i
+        ></a>
+        <div class="group-avatar">
+          <i class="fa-solid fa-users"></i>
+        </div>
+        <div class="header-info">
+          <h3>COE Community Hub</h3>
+          <div class="status-wrapper">
+            <span class="pulse-dot"></span>
+            <span class="status-text">Active Now</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div id="chatBox"></div>
+    <div id="emoji-picker"></div>
+
+    <div class="chat-input">
+      <div class="input-pill">
+        <i
+          class="fa-regular fa-face-smile action-btn"
+          onclick="toggleEmoji()"
+        ></i>
+        <input
+          type="text"
+          id="msgInput"
+          placeholder="Message..."
+          autocomplete="off"
+        />
+        <button class="send-btn" onclick="sendMessage()">
+          <i class="fa-solid fa-paper-plane"></i>
+        </button>
+      </div>
+    </div>
+
+    <script>
+      const myEmail = sessionStorage.getItem("user_id");
+      const myName = sessionStorage.getItem("user_name");
+
+      // Emoji Logic
+      const picker = new EmojiMart.Picker({
+        theme: "light",
+        onEmojiSelect: (emoji) => {
+          document.getElementById("msgInput").value += emoji.native;
+          toggleEmoji();
+        },
+      });
+      document.getElementById("emoji-picker").appendChild(picker);
+      function toggleEmoji() {
+        const el = document.getElementById("emoji-picker");
+        el.style.display = el.style.display === "block" ? "none" : "block";
+      }
+
+      async function loadMsgs() {
+        const userEmail = sessionStorage.getItem("user_id");
+        console.log("History Fetch for:", userEmail);
+
+        if (!userEmail) {
+          window.location.href = "login.html";
+          return;
+        }
+        try {
+          const res = await fetch(
+            "http://127.0.0.1:5000/api/community/messages",
+          );
+          const data = await res.json();
+          const box = document.getElementById("chatBox");
+          const isBottom =
+            box.scrollHeight - box.clientHeight <= box.scrollTop + 100;
+
+          box.innerHTML = data
+            .map((m) => {
+              const isMe = m.user_email === myEmail;
+              const isImg = m.message.startsWith("IMG:");
+
+              const content = isImg
+                ? `<img src="${m.message.replace("IMG:", "")}" class="chat-img" onclick="window.open(this.src, '_blank')">`
+                : `<span>${m.message}</span>`;
+
+              return `
+               <div class="msg-row ${isMe ? "out" : "in"}">
+               <div class="bubble ${isMe ? "out" : "in"}">
+              ${
+                !isMe
+                  ? `
+               <span class="sender-info">
+               ${m.user_name} <span style="font-size: 9px; opacity: 0.7; font-weight: 400;">(${m.user_email})</span>
+               </span>
+                `
+                  : ""
+              }
+               ${content}
+               <div class="bubble-footer">
+               <span>${new Date(m.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</span>
+               ${isMe ? `<i class="fa-solid fa-trash-can delete-ico" onclick="deleteMsg(${m.id})"></i>` : ""}
+               </div>
+               </div>
+                </div>
+                `;
+            })
+            .join("");
+
+          if (isBottom) box.scrollTop = box.scrollHeight;
+        } catch (e) {
+          console.error(e);
+        }
+      }
+
+      async function sendMessage() {
+        const input = document.getElementById("msgInput");
+        if (!input.value.trim()) return;
+        await postMsg(input.value);
+        input.value = "";
+      }
+
+      async function postMsg(txt) {
+        await fetch("http://127.0.0.1:5000/api/community/send", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: myEmail, name: myName, message: txt }),
+        });
+        loadMsgs();
+      }
+
+      async function deleteMsg(id) {
+        await fetch("http://127.0.0.1:5000/api/community/delete", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id, email: myEmail }),
+        });
+        loadMsgs();
+      }
+
+      document
+        .getElementById("msgInput")
+        .addEventListener(
+          "keypress",
+          (e) => e.key === "Enter" && sendMessage(),
+        );
+      window.onload = loadMsgs;
+      setInterval(loadMsgs, 4000);
+
+      function applyTheme() {
+        const currentTheme = localStorage.getItem("theme");
+        if (currentTheme === "dark") {
+          document.body.classList.add("dark-theme");
+        } else {
+          document.body.classList.remove("dark-theme");
+        }
+      }
+
+      window.addEventListener("load", () => {
+        applyTheme();
+        loadMsgs();
+      });
+    </script>
+  </body>
+</html>

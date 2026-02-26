@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Knowledge Hub | COE Admin</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+      :root {
+        --primary: #6a11cb;
+        --danger: #ff4757;
+        --success: #2ecc71;
+        --text-dark: #0f172a;
+      }
+      body {
+        background: #f4f7f6;
+        font-family: "Segoe UI", sans-serif;
+        margin: 0;
+        padding: 20px;
+        color: var(--text-dark);
+      }
+      .container {
+        max-width: 1200px;
+        margin: auto;
+      }
+      .card {
+        background: white;
+        border-radius: 12px;
+        padding: 25px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        margin-bottom: 25px;
+      }
+      .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+      }
+      .back-btn {
+        background: var(--primary);
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: bold;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      /* Form Styling */
+      .upload-row {
+        display: flex;
+        gap: 15px;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+      input[type="file"] {
+        flex: 1;
+        padding: 12px;
+        border: 2px solid #e2e8f0;
+        border-radius: 10px;
+        min-width: 280px;
+        font-weight: 600;
+      }
+
+      /* Table Styling */
+      .table-responsive {
+        overflow-x: auto;
+        border-radius: 10px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 15px;
+      }
+      th,
+      td {
+        padding: 15px;
+        text-align: left;
+        border-bottom: 1px solid #eee;
+      }
+      th {
+        background: var(--primary);
+        color: white;
+        font-weight: 800;
+        text-transform: uppercase;
+        font-size: 13px;
+      }
+      td {
+        font-weight: 600;
+        color: #1e293b;
+      }
+
+      /* Action Buttons */
+      .action-btn {
+        padding: 8px 14px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 700;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: 0.2s;
+        border: none;
+        cursor: pointer;
+      }
+      .btn-update {
+        background: var(--success);
+        color: white;
+      }
+      .btn-preview {
+        background: #ecfdf5;
+        color: #059669;
+      }
+      .btn-preview:hover {
+        background: #059669;
+        color: white;
+      }
+      .btn-delete {
+        background: #fef2f2;
+        color: #dc2626;
+        margin-left: 5px;
+      }
+      .btn-delete:hover {
+        background: #dc2626;
+        color: white;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1><i class="fa-solid fa-brain"></i> AI Knowledge Hub</h1>
+        <a href="admin.html" class="back-btn">
+          <i class="fa-solid fa-arrow-left"></i> Back to Dashboard
+        </a>
+      </div>
+
+      <div class="card" style="border-top: 5px solid var(--primary)">
+        <h3>
+          <i class="fa-solid fa-file-arrow-up"></i> Upload Training Material
+        </h3>
+        <p style="color: #64748b; font-size: 14px; margin-bottom: 15px">
+          Upload PDF or Text files to train the AI Assistant with college data.
+        </p>
+        <div class="upload-row">
+          <input type="file" id="adminFile" accept=".pdf,.txt,.docx" />
+          <button
+            class="action-btn btn-update"
+            onclick="uploadFile()"
+            style="padding: 14px 25px"
+          >
+            <i class="fa-solid fa-cloud-arrow-up"></i> Upload & Process
+          </button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3><i class="fa-solid fa-database"></i> Existing AI Knowledge Base</h3>
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th>Document Name</th>
+                <th>Content Preview</th>
+                <th style="text-align: center">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="knowledgeTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const API_BASE = "http://127.0.0.1:5000";
+
+      // 1. Fetch Documents
+      async function fetchKnowledge() {
+        try {
+          const res = await fetch(`${API_BASE}/admin/get_knowledge`);
+          const data = await res.json();
+          const tbody = document.getElementById("knowledgeTableBody");
+
+          const aiDocs = data.filter((doc) => {
+            const cat = doc.category.toLowerCase();
+            return !cat.includes(".xls") && !cat.includes(".csv");
+          });
+
+          if (aiDocs.length === 0) {
+            tbody.innerHTML =
+              '<tr><td colspan="3" style="text-align:center; padding:20px;">No documents in memory.</td></tr>';
+            return;
+          }
+
+          tbody.innerHTML = aiDocs
+            .map((doc) => {
+              const fileName = doc.category.replace("Document: ", "");
+              return `
+                <tr>
+                    <td><i class="fa-solid fa-file-pdf" style="color: #e74c3c;"></i> <b>${fileName}</b></td>
+                    <td style="color: #475569; font-size: 13px;">${doc.preview || "No preview available"}...</td>
+                    <td style="text-align: center; min-width: 220px;">
+                        <a href="${API_BASE}/static/uploads/ai_docs/${fileName}" target="_blank" class="action-btn btn-preview">
+                            <i class="fa-solid fa-eye"></i> Preview
+                        </a>
+                        <button class="action-btn btn-delete" onclick="deleteKnowledge(${doc.id})">
+                            <i class="fa-solid fa-trash-can"></i> Delete
+                        </button>
+                    </td>
+                </tr>`;
+            })
+            .join("");
+        } catch (err) {
+          console.error("Fetch Error:", err);
+        }
+      }
+
+      // 2. Upload Functionality
+
+      async function uploadFile() {
+        const fileInput = document.getElementById("adminFile");
+        if (!fileInput.files[0])
+          return Swal.fire("Error", "Select a file", "error");
+
+        const formData = new FormData();
+        formData.append("file", fileInput.files[0]);
+
+        Swal.fire({
+          title: "Uploading...",
+          text: "AI is indexing the document",
+          didOpen: () => Swal.showLoading(),
+        });
+
+        try {
+          const res = await fetch(`${API_BASE}/admin/upload_knowledge`, {
+            method: "POST",
+            body: formData,
+          });
+          const result = await res.json();
+          if (result.success) {
+            await Swal.fire("Success", "Knowledge base updated!", "success");
+
+            fetchKnowledge();
+
+            fileInput.value = "";
+          }
+        } catch (err) {
+          Swal.fire("Error", "Server Error", "error");
+        }
+      }
+
+      // 3. Delete Functionality
+      async function deleteKnowledge(id) {
+        const result = await Swal.fire({
+          title: "Delete permanent?",
+          text: "AI will lose this information from memory.",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonColor: "#ff4757",
+        });
+
+        if (result.isConfirmed) {
+          await fetch(`${API_BASE}/admin/delete_knowledge`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ id }),
+          });
+          fetchKnowledge();
+        }
+      }
+
+      window.onload = fetchKnowledge;
+    </script>
+  </body>
+</html>

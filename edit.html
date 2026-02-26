@@ -1,0 +1,309 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Edit Profile | COE Assistant</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+      :root {
+        --indigo-dark: #30336b;
+        --indigo-light: #4834d4;
+      }
+
+      * {
+        box-sizing: border-box;
+        font-family: "Inter", "Segoe UI", sans-serif;
+      }
+
+      body {
+        /* Background Image */
+        background: url("image/geminicoeimg.png") no-repeat center center fixed;
+        background-size: cover;
+        margin: 0;
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        min-height: 100vh;
+        padding-right: 80px;
+      }
+
+      .wrapper {
+        background: rgba(255, 255, 255, 0);
+        backdrop-filter: none;
+        max-width: 450px;
+        width: 100%;
+        padding: 40px;
+        border-radius: 30px;
+        border: 2px solid rgba(255, 255, 255, 0.5);
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+        position: relative;
+      }
+
+      /* Heading with Shadow for visibility */
+      h2 {
+        color: #fff;
+        text-align: center;
+        margin-bottom: 25px;
+        font-size: 28px;
+        font-weight: 800;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+      }
+
+      .form-group {
+        margin-bottom: 15px;
+      }
+
+      /* Labels with Shadow */
+      label {
+        display: block;
+        margin-bottom: 6px;
+        font-weight: 800;
+        color: #fff;
+        font-size: 14px;
+        text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8);
+      }
+
+      input {
+        width: 100%;
+        padding: 14px;
+        border-radius: 14px;
+        background: rgba(0, 0, 0, 0.3);
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        color: #fff;
+        font-size: 15px;
+        font-weight: 600;
+        transition: 0.3s;
+        outline: none;
+      }
+
+      input::placeholder {
+        color: #ccc;
+      }
+
+      /* Locked/Readonly Field */
+      input[readonly] {
+        background: rgba(0, 0, 0, 0.5);
+        color: #aaa;
+        border: 2px dashed rgba(255, 255, 255, 0.2);
+        cursor: not-allowed;
+      }
+
+      input:focus {
+        border-color: var(--indigo-light);
+        background: rgba(0, 0, 0, 0.5);
+      }
+
+      /* Submit Button */
+      .btn-save {
+        background: linear-gradient(
+          135deg,
+          var(--indigo-dark),
+          var(--indigo-light)
+        );
+        color: white;
+        border: none;
+        padding: 16px;
+        border-radius: 16px;
+        width: 100%;
+        font-size: 18px;
+        font-weight: 800;
+        cursor: pointer;
+        transition: 0.4s;
+        margin-top: 15px;
+        text-transform: uppercase;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+      }
+
+      .btn-save:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 30px rgba(72, 52, 212, 0.4);
+      }
+
+      /* Back Button */
+      .back-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        text-decoration: none;
+        color: #fff;
+        font-weight: 800;
+        margin-bottom: 20px;
+        font-size: 14px;
+        background: rgba(255, 255, 255, 0.2);
+        padding: 8px 15px;
+        border-radius: 20px;
+        text-shadow: 1px 1px 2px #000;
+      }
+
+      .back-btn:hover {
+        background: rgba(255, 255, 255, 0.3);
+      }
+
+      select {
+        width: 100%;
+        padding: 14px;
+        border-radius: 14px;
+        background: rgba(0, 0, 0, 0.5);
+
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        color: #fff;
+        font-size: 15px;
+        font-weight: 600;
+        outline: none;
+        cursor: pointer;
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='white' viewBox='0 0 24 24'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 15px center;
+        background-size: 20px;
+      }
+
+      select:focus {
+        border-color: var(--indigo-light);
+        background: rgba(0, 0, 0, 0.6);
+      }
+
+      select option {
+        background: #30336b;
+        color: #fff;
+        padding: 10px;
+      }
+
+      @media (max-width: 768px) {
+        body {
+          justify-content: center;
+          padding-right: 0;
+          padding: 20px;
+        }
+        .wrapper {
+          max-width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrapper">
+      <a href="setting.html" class="back-btn"
+        ><i class="fa-solid fa-arrow-left"></i> Back</a
+      >
+      <h2><i class="fa-solid fa-user-pen"></i> Edit Profile</h2>
+
+      <form id="editForm">
+        <div class="form-group">
+          <label>Email ID (Locked)</label>
+          <input type="email" id="editEmail" readonly />
+        </div>
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" id="editName" required />
+        </div>
+        <div class="form-group">
+          <label>Roll Number</label>
+          <input
+            type="text"
+            id="editRoll"
+            placeholder="Min. 8 digits required"
+            minlength="8"
+            oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <label>Course</label>
+          <select id="editCourse">
+            <option value="">All Courses</option>
+            <option value="BCA">BCA</option>
+            <option value="B.Sc">B.Sc</option>
+            <option value="B.A">B.A</option>
+            <option value="B.Com">B.Com</option>
+            <option value="BBA">BBA</option>
+            <option value="PGDCA">PGDCA</option>
+
+            <option value="B.Voc">B.Voc</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Phone Number</label>
+          <input type="text" id="editPhone" />
+        </div>
+        <button type="submit" class="btn-save">Save Changes</button>
+      </form>
+    </div>
+
+    <script>
+      const API_BASE = "http://127.0.0.1:5000";
+      const userEmail = sessionStorage.getItem("user_id");
+
+      async function fetchCurrentData() {
+        if (!userEmail) return;
+        document.getElementById("editEmail").value = userEmail;
+        try {
+          const res = await fetch(`${API_BASE}/get_profile`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email: userEmail }),
+          });
+          const data = await res.json();
+          if (!data.error) {
+            document.getElementById("editName").value = data.name || "";
+            document.getElementById("editRoll").value = data.roll || "";
+            document.getElementById("editCourse").value = data.course || "";
+            document.getElementById("editPhone").value = data.phone || "";
+          }
+        } catch (err) {
+          console.error(err);
+        }
+      }
+
+      document.getElementById("editForm").onsubmit = async (e) => {
+        e.preventDefault();
+
+        const rollValue = document.getElementById("editRoll").value;
+
+        if (rollValue.length < 8) {
+          Swal.fire(
+            "Error",
+            "Roll Number must be at least 8 digits!",
+            "warning",
+          );
+          return;
+        }
+        const payload = {
+          email: userEmail,
+          name: document.getElementById("editName").value,
+          roll: document.getElementById("editRoll").value,
+          course: document.getElementById("editCourse").value,
+          phone: document.getElementById("editPhone").value,
+        };
+        Swal.fire({ title: "Updating...", didOpen: () => Swal.showLoading() });
+        try {
+          const res = await fetch(`${API_BASE}/update_profile`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          });
+          const result = await res.json();
+          if (result.success) {
+            await Swal.fire(
+              "Updated!",
+              "Your profile has been saved.",
+              "success",
+            );
+            window.location.href = "setting.html";
+          } else {
+            Swal.fire("Error", "Update failed (Check Details)", "error");
+          }
+        } catch (err) {
+          Swal.fire("Error", "Server down", "error");
+        }
+      };
+
+      fetchCurrentData();
+    </script>
+  </body>
+</html>

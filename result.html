@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Academic Result | COE Assistant</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+    />
+    <style>
+      :root {
+        --accent: #6a11cb;
+        --bg: #f0f2f5;
+        --card: #ffffff;
+        --text: #1e293b;
+      }
+      body {
+        background: var(--bg);
+        font-family: "Segoe UI", sans-serif;
+        margin: 0;
+        padding: 15px;
+        color: var(--text);
+      }
+
+      .res-wrapper {
+        max-width: 750px;
+        margin: 20px auto;
+        background: var(--card);
+        padding: 35px;
+        border-radius: 30px;
+        box-shadow: 0 15px 50px rgba(0, 0, 0, 0.1);
+      }
+
+      .back-link {
+        text-decoration: none;
+        color: var(--accent);
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 25px;
+        transition: 0.3s;
+      }
+      .back-link:hover {
+        transform: translateX(-5px);
+      }
+
+      .res-header {
+        text-align: center;
+        border-bottom: 2px solid #f1f5f9;
+        padding-bottom: 20px;
+        margin-bottom: 25px;
+      }
+      .res-header h2 {
+        margin: 10px 0;
+        color: var(--accent);
+        font-size: 26px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      /* Student Detailed Info Section */
+      .student-info-card {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        background: #f8fafc;
+        padding: 25px;
+        border-radius: 20px;
+        margin-bottom: 30px;
+        border: 1px solid #e2e8f0;
+      }
+      .info-box b {
+        color: var(--accent);
+        display: block;
+        margin-bottom: 5px;
+        text-transform: uppercase;
+        font-size: 11px;
+        letter-spacing: 1px;
+      }
+      .info-box span {
+        font-size: 16px;
+        font-weight: 600;
+        color: #334155;
+      }
+
+      /* Table Design */
+      .table-responsive {
+        overflow-x: auto;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+      }
+      th {
+        text-align: left;
+        padding: 15px;
+        background: #f1f5f9;
+        color: var(--accent);
+        text-transform: uppercase;
+        font-size: 12px;
+      }
+      td {
+        padding: 15px;
+        border-bottom: 1px solid #f1f5f9;
+        font-size: 15px;
+      }
+      .marks-bold {
+        font-weight: 700;
+        color: #10b981;
+        font-size: 16px;
+      }
+
+      /* Summary Section */
+      .summary-card {
+        margin-top: 30px;
+        padding: 30px;
+        background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+        border-radius: 20px;
+        text-align: center;
+        color: white;
+        box-shadow: 0 10px 25px rgba(106, 17, 203, 0.3);
+      }
+      .summary-card h3 {
+        margin: 5px 0;
+        font-size: 32px;
+      }
+      .summary-card p {
+        margin: 0;
+        opacity: 0.9;
+        font-size: 14px;
+      }
+
+      @media (max-width: 600px) {
+        .student-info-card {
+          grid-template-columns: 1fr;
+        }
+        .res-wrapper {
+          padding: 20px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="res-wrapper">
+      <a href="setting.html" class="back-link"
+        ><i class="fa-solid fa-arrow-left"></i> Back to Settings</a
+      >
+
+      <div class="res-header">
+        <i
+          class="fa-solid fa-graduation-cap"
+          style="font-size: 50px; color: var(--accent)"
+        ></i>
+        <h2>Official Marksheet</h2>
+        <p style="opacity: 0.6; font-size: 14px">
+          Government College Sanjauli (COE)
+        </p>
+      </div>
+
+      <div class="student-info-card">
+        <div class="info-box">
+          <b>Student Name</b><span id="resName">Loading...</span>
+        </div>
+        <div class="info-box">
+          <b>Roll Number</b><span id="resRoll">Loading...</span>
+        </div>
+        <div class="info-box">
+          <b>Course</b><span id="resCourse">Loading...</span>
+        </div>
+        <div class="info-box">
+          <b>Student ID (Email)</b><span id="resEmail">Loading...</span>
+        </div>
+      </div>
+
+      <div class="table-responsive">
+        <table>
+          <thead>
+            <tr>
+              <th>Subject Name</th>
+              <th style="text-align: right">Marks Obtained / Total</th>
+            </tr>
+          </thead>
+          <tbody id="resTableBody">
+            <tr>
+              <td colspan="2" style="text-align: center; padding: 20px">
+                Fetching details...
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="summary-card" id="summarySection" style="display: none">
+        <p>Final Aggregate</p>
+        <h3 id="percentageText">0%</h3>
+        <p id="totalMarksText">Total: 0 / 0</p>
+      </div>
+    </div>
+
+    <script>
+      const userEmail = sessionStorage.getItem("user_id");
+
+      async function initResultPage() {
+        if (!userEmail) {
+          window.location.href = "login.html";
+          return;
+        }
+
+        try {
+          // 1. student profile
+          const profileRes = await fetch("http://127.0.0.1:5000/get_profile", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email: userEmail }),
+          });
+          const profile = await profileRes.json();
+
+          if (!profile.error) {
+            document.getElementById("resName").innerText =
+              profile.name || "N/A";
+            document.getElementById("resRoll").innerText =
+              profile.roll || "N/A";
+            document.getElementById("resCourse").innerText =
+              profile.course || "N/A";
+            document.getElementById("resEmail").innerText = userEmail;
+          }
+
+          // 2. Marks fetch
+          const marksRes = await fetch("http://127.0.0.1:5000/get_result", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email: userEmail }),
+          });
+          const marksData = await marksRes.json();
+
+          const tbody = document.getElementById("resTableBody");
+          if (marksData.success && marksData.results.length > 0) {
+            let rowsHtml = "";
+            let earned = 0,
+              total = 0;
+
+            marksData.results.forEach((item) => {
+              earned += parseInt(item.marks);
+              total += parseInt(item.total_marks);
+              rowsHtml += `
+                            <tr>
+                                <td><b>${item.subject}</b></td>
+                                <td style="text-align: right;"><span class="marks-bold">${item.marks}</span> / ${item.total_marks}</td>
+                            </tr>`;
+            });
+
+            tbody.innerHTML = rowsHtml;
+
+            // Summary Update
+            const percent = ((earned / total) * 100).toFixed(2);
+            document.getElementById("percentageText").innerText = percent + "%";
+            document.getElementById("totalMarksText").innerText =
+              `Grand Total: ${earned} / ${total}`;
+            document.getElementById("summarySection").style.display = "block";
+          } else {
+            tbody.innerHTML =
+              "<tr><td colspan='2' style='text-align:center; padding:30px; color:red;'>Result not uploaded yet by Admin.</td></tr>";
+          }
+        } catch (err) {
+          console.error(err);
+          document.getElementById("resTableBody").innerHTML =
+            "<tr><td colspan='2' style='text-align:center;'>Server Connection Error!</td></tr>";
+        }
+      }
+
+      initResultPage();
+    </script>
+  </body>
+</html>

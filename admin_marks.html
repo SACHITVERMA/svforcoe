@@ -1,0 +1,579 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Examination Management | COE Admin</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+      :root {
+        --primary: #6a11cb;
+        --danger: #ff4757;
+        --success: #2ecc71;
+        --text-dark: #0f172a;
+      }
+      body {
+        background: #f4f7f6;
+        font-family: "Segoe UI", sans-serif;
+        margin: 0;
+        padding: 20px;
+        color: var(--text-dark);
+      }
+      .container {
+        max-width: 1250px;
+        margin: auto;
+      }
+      .card {
+        background: white;
+        border-radius: 15px;
+        padding: 25px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        margin-bottom: 25px;
+        border: 1px solid #eee;
+      }
+      .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+      }
+      .back-btn {
+        background: var(--primary);
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: bold;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .responsive-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 15px;
+        margin-bottom: 20px;
+      }
+      .notice-form {
+        display: grid;
+        gap: 12px;
+        grid-template-columns: 2fr 1fr 1fr 50px;
+        align-items: center;
+        margin-bottom: 10px;
+      }
+
+      input,
+      select {
+        padding: 12px;
+        border: 1.5px solid #e2e8f0;
+        border-radius: 10px;
+        outline: none;
+        font-weight: 600;
+        width: 100%;
+        box-sizing: border-box;
+      }
+      input:focus {
+        border-color: var(--primary);
+      }
+
+      .btn {
+        padding: 12px 20px;
+        border-radius: 10px;
+        border: none;
+        cursor: pointer;
+        font-weight: bold;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        color: white;
+        transition: 0.3s;
+      }
+      .btn-primary {
+        background: var(--primary);
+      }
+      .btn-success {
+        background: var(--success);
+      }
+      .btn-danger {
+        background: var(--danger);
+      }
+      .btn-secondary {
+        background: #64748b;
+      }
+
+      .table-responsive {
+        overflow-x: auto;
+        border-radius: 12px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 15px;
+        min-width: 800px;
+      }
+      th,
+      td {
+        padding: 15px;
+        text-align: left;
+        border-bottom: 1px solid #eee;
+        font-size: 14px;
+      }
+      th {
+        background: var(--primary);
+        color: white;
+        text-transform: uppercase;
+        font-weight: 800;
+      }
+      td {
+        font-weight: 600;
+        color: #1e293b;
+      }
+      .badge-info {
+        background: #e0e7ff;
+        color: #4338ca;
+        padding: 4px 8px;
+        border-radius: 6px;
+        font-size: 12px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>
+          <i class="fa-solid fa-graduation-cap"></i> Examination & Marks Portal
+        </h1>
+        <a href="admin.html" class="back-btn"
+          ><i class="fa-solid fa-arrow-left"></i> Back to Dashboard</a
+        >
+      </div>
+
+      <div class="card" style="border-top: 5px solid var(--success)">
+        <h3>
+          <i class="fa-solid fa-file-import"></i> Bulk Import Results
+          (Excel/CSV)
+        </h3>
+        <p style="font-size: 13px; color: #64748b; margin-bottom: 15px">
+          Required format:
+          <b>ROLL_NO, SUBJECT, MARKS, TOTAL_MARKS, SEMESTER/YEAR</b>
+        </p>
+        <div class="responsive-grid">
+          <input type="file" id="bulkMarksFile" accept=".csv, .xlsx, .xls" />
+          <button class="btn btn-success" onclick="importBulkMarks()">
+            <i class="fa-solid fa-upload"></i> Import & Process
+          </button>
+          <button class="btn btn-danger" onclick="clearFullResultsTable()">
+            <i class="fa-solid fa-triangle-exclamation"></i> WIPE ALL RESULTS
+          </button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div
+          style="
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+          "
+        >
+          <h3>
+            <i class="fa-solid fa-clock-rotate-left"></i> Marks Import History
+          </h3>
+          <button class="btn btn-secondary" onclick="fetchImportHistory()">
+            <i class="fa-solid fa-arrows-rotate"></i> Refresh History
+          </button>
+        </div>
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th>File Name</th>
+                <th>Status</th>
+                <th>Date & Time</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="importHistoryBody">
+              <tr>
+                <td colspan="4" style="text-align: center">
+                  Loading history...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3><i class="fa-solid fa-file-signature"></i> Manual Marks Entry</h3>
+        <div class="responsive-grid">
+          <input
+            type="email"
+            id="resEmail"
+            placeholder="Student Email (Required)"
+          />
+          <input type="text" id="resRoll" placeholder="Verify Roll No." />
+          <select id="resCourse" placeholder="Verify Course">
+            <option value="BCA">BCA</option>
+            <option value="B.Sc">B.Sc</option>
+            <option value="B.A">B.A</option>
+            <option value="B.Com">B.Com</option>
+            <option value="BBA">BBA</option>
+            <option value="PGDCA">PGDCA</option>
+            <option value="B.Voc">B.Voc</option>
+          </select>
+        </div>
+        <div id="subjectRows">
+          <div class="notice-form">
+            <input type="text" class="sub-name" placeholder="Subject Name" />
+            <input type="number" class="sub-marks" placeholder="Obtained" />
+            <input
+              type="number"
+              class="sub-total"
+              value="100"
+              placeholder="Total"
+            />
+            <button
+              class="btn btn-danger"
+              style="padding: 10px"
+              onclick="this.parentElement.remove()"
+            >
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </div>
+        </div>
+        <div style="display: flex; gap: 10px; margin-top: 15px">
+          <button class="btn btn-secondary" onclick="addSubjectRow()">
+            <i class="fa-solid fa-plus"></i> Add Subject
+          </button>
+          <button class="btn btn-primary" onclick="saveAllResults()">
+            <i class="fa-solid fa-save"></i> Save All Marks
+          </button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>
+          <i class="fa-solid fa-magnifying-glass"></i> Manage / Edit Existing
+          Results
+        </h3>
+        <div class="responsive-grid">
+          <input
+            type="text"
+            id="editSearchRoll"
+            placeholder="Search Roll Number"
+          />
+          <input
+            type="text"
+            id="editSearchName"
+            placeholder="Name (Optional)"
+          />
+          <select id="editSearchCourse">
+            <option value="">All Courses</option>
+            <option value="BCA">BCA</option>
+            <option value="B.Sc">B.Sc</option>
+            <option value="B.A">B.A</option>
+            <option value="B.Com">B.Com</option>
+            <option value="BBA">BBA</option>
+            <option value="PGDCA">PGDCA</option>
+
+            <option value="B.Voc">B.Voc</option>
+          </select>
+          <button class="btn btn-primary" onclick="searchByDetails()">
+            <i class="fa-solid fa-search"></i> Search Student
+          </button>
+        </div>
+
+        <div
+          id="studentDetailHeader"
+          style="
+            display: none;
+            margin-bottom: 15px;
+            padding: 15px;
+            background: #eef2ff;
+            border-radius: 12px;
+            border-left: 5px solid var(--primary);
+          "
+        >
+          <div
+            style="
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+            "
+          >
+            <div>
+              <b>Student:</b> <span id="resStudentName"></span> | <b>Roll:</b>
+              <span id="resStudentRoll"></span>
+            </div>
+            <button class="btn btn-danger" onclick="bulkDeleteMarks()">
+              <i class="fa-solid fa-trash-can"></i> Bulk Delete
+            </button>
+          </div>
+        </div>
+
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th>Subject</th>
+                <th>Marks</th>
+                <th>Total</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="editMarksTableBody">
+              <tr>
+                <td colspan="4" style="text-align: center; color: #888">
+                  Search for a student to edit marks.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const API_BASE = "http://127.0.0.1:5000";
+      let currentEditingEmail = "";
+
+      // --- INITIAL LOAD ---
+      window.onload = function () {
+        fetchImportHistory();
+      };
+
+      async function importBulkMarks() {
+        const fileInput = document.getElementById("bulkMarksFile");
+        if (!fileInput.files[0])
+          return Swal.fire("Error", "Select a file first", "error");
+
+        const formData = new FormData();
+        formData.append("file", fileInput.files[0]);
+        Swal.fire({
+          title: "Processing...",
+          didOpen: () => Swal.showLoading(),
+        });
+
+        try {
+          const res = await fetch(`${API_BASE}/admin/import_bulk_marks`, {
+            method: "POST",
+            body: formData,
+          });
+          const data = await res.json();
+          if (data.success) {
+            await Swal.fire(
+              "Success",
+              `Imported ${data.count} records.`,
+              "success",
+            );
+            fileInput.value = "";
+            fetchImportHistory();
+          } else {
+            Swal.fire("Error", data.message, "error");
+          }
+        } catch (e) {
+          Swal.fire("Error", "Server failure", "error");
+        }
+      }
+
+      // --- IMPORT HISTORY
+      async function fetchImportHistory() {
+        try {
+          const res = await fetch(`${API_BASE}/admin/get_knowledge`);
+          const docs = await res.json();
+          const tbody = document.getElementById("importHistoryBody");
+          const excelDocs = docs.filter((d) =>
+            d.category.toLowerCase().match(/\.(xlsx|xls|csv)$/),
+          );
+
+          if (excelDocs.length === 0) {
+            tbody.innerHTML =
+              '<tr><td colspan="4" style="text-align:center">No import logs found.</td></tr>';
+            return;
+          }
+
+          tbody.innerHTML = excelDocs
+            .map(
+              (doc) => `
+                <tr>
+                    <td><b>${doc.category.replace("Document: ", "")}</b></td>
+                    <td><span class="badge-info">Processed</span></td>
+                    <td>${doc.created_at || "N/A"}</td>
+                    <td><button class="btn btn-danger" style="padding:5px 10px" onclick="deleteHistoryLog(${doc.id})"><i class="fa-solid fa-trash"></i></button></td>
+                </tr>`,
+            )
+            .join("");
+        } catch (err) {
+          console.log(err);
+        }
+      }
+
+      // --- MANUAL ENTRY
+      function addSubjectRow() {
+        const row = document.createElement("div");
+        row.className = "notice-form";
+        row.innerHTML = `<input type="text" class="sub-name" placeholder="Subject"><input type="number" class="sub-marks" placeholder="Marks"><input type="number" class="sub-total" value="100"><button class="btn btn-danger" style="padding:10px" onclick="this.parentElement.remove()"><i class="fa-solid fa-xmark"></i></button>`;
+        document.getElementById("subjectRows").appendChild(row);
+      }
+
+      async function saveAllResults() {
+        const email = document.getElementById("resEmail").value.trim();
+        const roll = document.getElementById("resRoll").value.trim();
+        const course = document.getElementById("resCourse").value.trim();
+        const subjects = [];
+        document
+          .querySelectorAll("#subjectRows .notice-form")
+          .forEach((row) => {
+            const name = row.querySelector(".sub-name").value;
+            const marks = row.querySelector(".sub-marks").value;
+            const total = row.querySelector(".sub-total").value;
+            if (name && marks) subjects.push({ subject: name, marks, total });
+          });
+        if (!email || subjects.length === 0)
+          return Swal.fire("Error", "Fill all details", "warning");
+
+        const res = await fetch(`${API_BASE}/admin/add_bulk_marks`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, roll, course, results: subjects }),
+        });
+        if ((await res.json()).success) {
+          Swal.fire("Saved!", "Marks added manually", "success");
+          document.getElementById("subjectRows").innerHTML = ""; // Reset rows
+        }
+      }
+
+      // --- SEARCH & EDIT
+      async function searchByDetails() {
+        const roll = document.getElementById("editSearchRoll").value;
+        const name = document.getElementById("editSearchName").value;
+        const course = document.getElementById("editSearchCourse").value;
+        const res = await fetch(`${API_BASE}/admin/get_result_by_roll`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ roll, name, course }),
+        });
+        const data = await res.json();
+        const tbody = document.getElementById("editMarksTableBody");
+        if (data.success) {
+          currentEditingEmail = data.email;
+          document.getElementById("resStudentName").innerText = data.name;
+          document.getElementById("resStudentRoll").innerText = roll;
+          document.getElementById("studentDetailHeader").style.display =
+            "block";
+          tbody.innerHTML = data.results
+            .map(
+              (row) => `
+                <tr>
+                    <td>${row.subject}</td>
+                    <td><input type="number" id="marks-${row.id}" value="${row.marks}" style="width:80px"></td>
+                    <td><input type="number" id="total-${row.id}" value="${row.total_marks}" style="width:80px"></td>
+                    <td>
+                        <button class="btn btn-success" style="padding:5px 10px" onclick="saveEditedMark(${row.id})"><i class="fa-solid fa-save"></i></button>
+                        <button class="btn btn-danger" style="padding:5px 10px" onclick="deleteMarkEntry(${row.id})"><i class="fa-solid fa-trash"></i></button>
+                    </td>
+                </tr>`,
+            )
+            .join("");
+        } else {
+          Swal.fire("Not found", data.message, "error");
+        }
+      }
+
+      async function saveEditedMark(id) {
+        const marks = document.getElementById(`marks-${id}`).value;
+        const total = document.getElementById(`total-${id}`).value;
+        await fetch(`${API_BASE}/admin/update_result`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id, marks, total }),
+        });
+        Swal.fire("Updated", "", "success");
+      }
+
+      async function bulkDeleteMarks() {
+        if (
+          (
+            await Swal.fire({
+              title: "Delete ALL marks?",
+              icon: "warning",
+              showCancelButton: true,
+            })
+          ).isConfirmed
+        ) {
+          await fetch(`${API_BASE}/admin/delete_all_marks`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email: currentEditingEmail }),
+          });
+          searchByDetails();
+        }
+      }
+
+      // --- DELETE LOGIC
+      async function clearFullResultsTable() {
+        const { value: confirmWord } = await Swal.fire({
+          title: "Wipe Database?",
+          text: "Type 'DELETE' to confirm clearing ALL marks.",
+          input: "text",
+          showCancelButton: true,
+          confirmButtonColor: "#ff4757",
+        });
+        if (confirmWord === "DELETE") {
+          await fetch(`${API_BASE}/admin/clear_all_results_database`, {
+            method: "POST",
+          });
+          Swal.fire("Wiped!", "Results table cleared.", "success");
+          fetchImportHistory();
+        }
+      }
+
+      async function deleteHistoryLog(id) {
+        if (
+          (
+            await Swal.fire({
+              title: "Remove file?",
+              icon: "warning",
+              showCancelButton: true,
+            })
+          ).isConfirmed
+        ) {
+          await fetch(`${API_BASE}/admin/delete_knowledge`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ id }),
+          });
+          fetchImportHistory();
+        }
+      }
+
+      async function deleteMarkEntry(id) {
+        if (
+          (
+            await Swal.fire({
+              title: "Delete this subject Marks?",
+              icon: "warning",
+              showCancelButton: true,
+            })
+          ).isConfirmed
+        ) {
+          await fetch(`${API_BASE}/admin/delete_result_entry`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ id }),
+          });
+          searchByDetails();
+        }
+      }
+    </script>
+  </body>
+</html>
