@@ -214,6 +214,35 @@
           text-shadow: 1px 1px 2px #000;
         }
       }
+
+      /*new tag  */
+      .bottom-corner-link {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: rgba(106, 11, 203, 0.8); /* Primary color with transparency */
+    color: white;
+    padding: 10px 15px;
+    border-radius: 30px;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    transition: 0.3s;
+    z-index: 1000;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.bottom-corner-link:hover {
+    background: var(--secondary);
+    transform: translateY(-3px);
+    color: #fff;
+}
+
+.bottom-corner-link i {
+    margin-right: 5px;
+}
+        
     </style>
   </head>
   <body>
@@ -274,6 +303,7 @@
         </div>
       </div>
     </div>
+    <a  class =" bottom-corner-link" href="admin.html"> click to access the admin portal</a>
 
     <script>
       let isAdminMode = false;
@@ -492,6 +522,7 @@
     </script>
   </body>
 </html>
+
 
 
 
