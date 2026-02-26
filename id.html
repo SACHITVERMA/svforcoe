@@ -451,10 +451,10 @@
         const formData = new FormData();
         const userEmail = sessionStorage.getItem("user_id");
 
-        if (!userEmail) {
-          Swal.fire("Error", "Session expired. Please login again.", "error");
-          return;
-        }
+        // if (!userEmail) {
+        //   Swal.fire("Error", "Session expired. Please login again.", "error");
+        //   return;
+        // }
 
         formData.append("email", userEmail);
         formData.append("fullName", document.getElementById("fullName").value);
@@ -521,3 +521,4 @@
     </script>
   </body>
 </html>
+
