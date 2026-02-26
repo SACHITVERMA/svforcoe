@@ -295,11 +295,11 @@
         console.log("Initializing Dashboard...");
         const userEmail = sessionStorage.getItem("user_id");
 
-        if (!userEmail) {
-          console.warn("No active session. Redirecting...");
-          window.location.href = "login.html";
-          return;
-        }
+        // if (!userEmail) {
+        //   console.warn("No active session. Redirecting...");
+        //   window.location.href = "login.html";
+        //   return;
+        // }
 
         // 1. Fetch Profile
         try {
@@ -366,3 +366,4 @@
     </script>
   </body>
 </html>
+
