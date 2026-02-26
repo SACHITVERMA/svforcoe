@@ -233,10 +233,10 @@
         const userEmail = sessionStorage.getItem("user_id");
         console.log("History Fetch for:", userEmail);
 
-        if (!userEmail) {
-          window.location.href = "login.html";
-          return;
-        }
+        // if (!userEmail) {
+        //   window.location.href = "login.html";
+        //   return;
+        // }
 
         try {
           const response = await fetch("http://127.0.0.1:5000/history", {
@@ -299,3 +299,4 @@
     </script>
   </body>
 </html>
+
