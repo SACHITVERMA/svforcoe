@@ -444,10 +444,10 @@
         const userEmail = sessionStorage.getItem("user_id");
         console.log("Fetch Notes for:", userEmail);
 
-        if (!userEmail) {
-          window.location.href = "login.html";
-          return;
-        }
+        // if (!userEmail) {
+        //   window.location.href = "login.html";
+        //   return;
+        // }
         try {
           const res = await fetch(`${API_BASE}/get_notes`);
           const notes = await res.json();
@@ -552,3 +552,4 @@
     </script>
   </body>
 </html>
+
