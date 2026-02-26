@@ -240,7 +240,7 @@
       const userEmail = sessionStorage.getItem("user_id");
 
       async function fetchCurrentData() {
-        // if (!userEmail) return;
+        if (!userEmail) return;
         document.getElementById("editEmail").value = userEmail;
         try {
           const res = await fetch(`${API_BASE}/get_profile`, {
@@ -307,5 +307,6 @@
     </script>
   </body>
 </html>
+
 
 
