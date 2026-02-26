@@ -260,11 +260,11 @@
         // --- 1. Load Profile & Email ---
         async function loadUserProfile() {
             const userEmail = sessionStorage.getItem("user_id");
-            if(!userEmail) {
-          console.warn("No active session. Redirecting...");
-          window.location.href = "login.html";
-          return;
-        } 
+        //     if(!userEmail) {
+        //   console.warn("No active session. Redirecting...");
+        //   window.location.href = "login.html";
+        //   return;
+        // } 
 
             // Display email immediately
             document.getElementById('profEmailDisplay').innerText = userEmail;
@@ -331,6 +331,7 @@
     </script>
 </body>
 </html>
+
 
 
 
